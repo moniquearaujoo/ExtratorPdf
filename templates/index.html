@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador de PDFs SISREG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .upload-container {
+            background-color: #c2e7f5;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .drop-area {
+            border: 2px dashed #6c757d;
+            border-radius: 5px;
+            padding: 60px 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .drop-area:hover, .drop-area.highlight {
+            border-color: #0d6efd;
+            background-color: #e9f7fe;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: white;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .file-name {
+            flex-grow: 1;
+            margin-right: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-size {
+            color: #6c757d;
+            font-size: 0.85rem;
+            min-width: 70px;
+            text-align: right;
+        }
+        .remove-file {
+            color: #dc3545;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .progress-container {
+            margin-top: 20px;
+        }
+        .results-container {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .result-title {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+        .result-status {
+            font-size: 0.85rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        .status-success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        .result-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        .data-item {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .data-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 3px;
+        }
+        .data-value {
+            word-break: break-word;
+        }
+        .not-found {
+            color: #dc3545;
+            font-style: italic;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 5px;
+        }
+        .planilha-input {
+            margin-top: 20px;
+        }
+        .copy-button {
+            cursor: pointer;
+            color: #0d6efd;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 150%;
+            left: 50%;
+            margin-left: -75px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-4">Processador de PDFs SISREG</h1>
+        
+        <div class="upload-container">
+            <h4 class="mb-3">1. Copie o código abaixo e adicione como participante na sua planilha em "Compartilhar"</h4>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="serviceAccountEmail" value="service-planilha@responsive-gist-456915.iam.gserviceaccount.com" readonly>
+                <button class="btn btn-outline-secondary tooltip" type="button" onclick="copyServiceAccount()">
+                    <span class="tooltiptext" id="copyTooltip">Copiar para área de transferência</span>
+                    <i class="bi bi-clipboard"></i> Copiar
+                </button>
+            </div>
+            
+            <h4 class="mb-3">2. Faça o upload dos arquivos, limite máximo de arquivos processados por vez: 10</h4>
+            <div class="drop-area" id="dropArea">
+                <div class="text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" width="64" height="64" alt="Upload">
+                    <p class="mt-3">Selecione seu arquivo PDF ou arraste e solte aqui</p>
+                    <p class="text-muted">Tamanho do arquivo limite tipo 2MB</p>
+                    <button class="btn btn-primary" id="selectFileBtn">SELECIONAR ARQUIVO</button>
+                    <input type="file" id="fileInput" style="display: none;" multiple accept=".pdf">
+                </div>
+            </div>
+            
+            <div class="file-list" id="fileList"></div>
+            
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <p class="text-center mt-2" id="progressText">Processando arquivos...</p>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <button class="btn btn-danger" id="clearBtn" disabled>Limpar</button>
+                <button class="btn btn-success" id="processBtn" disabled>Processar Arquivos</button>
+            </div>
+        </div>
+        
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <h3>Resultados do Processamento</h3>
+            <div class="alert alert-info" id="resultsStats"></div>
+            
+            <div id="resultsList"></div>
+            
+            <div class="planilha-input">
+                <h4>Adicionar à Planilha Google Sheets</h4>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">ID da Planilha</span>
+                    <input type="text" class="form-control" id="planilhaId" placeholder="Cole o ID da planilha do Google Sheets">
+                    <button class="btn btn-primary" id="addToPlanilhaBtn" disabled>Adicionar à Planilha</button>
+                </div>
+                <small class="text-muted">O ID da planilha é a parte da URL entre /d/ e /edit. Exemplo: https://docs.google.com/spreadsheets/d/<strong>1AbCdEfGhIjKlMnOpQrStUvWxYz</strong>/edit</small>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-outline-primary" id="downloadCsvBtn" disabled>Baixar CSV</button>
+                <button class="btn btn-outline-success" id="downloadExcelBtn" disabled>Baixar Excel</button>
+                <button class="btn btn-outline-secondary" id="newProcessBtn">Processar Novos Arquivos</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variáveis globais
+        const maxFiles = 10;
+        const maxFileSize = 2 * 1024 * 1024; // 2MB em bytes
+        let selectedFiles = [];
+        let processedResults = [];
+        
+        // Elementos DOM
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const selectFileBtn = document.getElementById('selectFileBtn');
+        const fileList = document.getElementById('fileList');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const clearBtn = document.getElementById('clearBtn');
+        const processBtn = document.getElementById('processBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsStats = document.getElementById('resultsStats');
+        const resultsList = document.getElementById('resultsList');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+        const newProcessBtn = document.getElementById('newProcessBtn');
+        const planilhaId = document.getElementById('planilhaId');
+        const addToPlanilhaBtn = document.getElementById('addToPlanilhaBtn');
+        
+        // Event Listeners
+        selectFileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        clearBtn.addEventListener('click', clearFiles);
+        processBtn.addEventListener('click', processFiles);
+        downloadCsvBtn.addEventListener('click', downloadCsv);
+        downloadExcelBtn.addEventListener('click', downloadExcel);
+        newProcessBtn.addEventListener('click', resetInterface);
+        addToPlanilhaBtn.addEventListener('click', addToPlanilha);
+        planilhaId.addEventListener('input', checkPlanilhaId);
+        
+        // Drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        // Funções
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+        
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+        
+        function handleFiles(files) {
+            if (selectedFiles.length + files.length > maxFiles) {
+                alert(`Você pode selecionar no máximo ${maxFiles} arquivos.`);
+                return;
+            }
+            
+            Array.from(files).forEach(file => {
+                // Verificar se é um PDF
+                if (!file.type.match('application/pdf')) {
+                    alert(`O arquivo "${file.name}" não é um PDF.`);
+                    return;
+                }
+                
+                // Verificar tamanho
+                if (file.size > maxFileSize) {
+                    alert(`O arquivo "${file.name}" excede o tamanho máximo de 2MB.`);
+                    return;
+                }
+                
+                // Verificar se já existe na lista
+                if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    alert(`O arquivo "${file.name}" já foi selecionado.`);
+                    return;
+                }
+                
+                selectedFiles.push(file);
+            });
+            
+            updateFileList();
+            updateButtons();
+        }
+        
+        function updateFileList() {
+            fileList.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const fileName = document.createElement('div');
+                fileName.className = 'file-name';
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('div');
+                fileSize.className = 'file-size';
+                fileSize.textContent = formatFileSize(file.size);
+                
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'remove-file';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.addEventListener('click', () => removeFile(index));
+                
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(fileSize);
+                fileItem.appendChild(removeBtn);
+                fileList.appendChild(fileItem);
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+            updateButtons();
+        }
+        
+        function updateButtons() {
+            clearBtn.disabled = selectedFiles.length === 0;
+            processBtn.disabled = selectedFiles.length === 0;
+        }
+        
+        function clearFiles() {
+            selectedFiles = [];
+            updateFileList();
+            updateButtons();
+        }
+        
+        function processFiles() {
+            if (selectedFiles.length === 0) {
+                alert('Selecione pelo menos um arquivo para processar.');
+                return;
+            }
+            
+            // Mostrar progresso
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressText.textContent = 'Preparando arquivos...';
+            
+            // Desabilitar botões durante o processamento
+            clearBtn.disabled = true;
+            processBtn.disabled = true;
+            
+            // Criar FormData
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+            
+            // Simular progresso (em uma aplicação real, você usaria um endpoint que reporta progresso)
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                if (progress < 90) {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${progress}%`;
+                    progressText.textContent = `Processando arquivos... ${progress}%`;
+                }
+            }, 300);
+            
+            // Enviar arquivos para o servidor
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                clearInterval(progressInterval);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                progressText.textContent = 'Processamento concluído!';
+                
+                return response.json();
+            })
+            .then(data => {
+                // Armazenar resultados
+                processedResults = data.resultados;
+                
+                // Mostrar resultados
+                showResults(data);
+                
+                // Habilitar botões de download se houver resultados bem-sucedidos
+                const sucessos = data.estatisticas.sucessos;
+                downloadCsvBtn.disabled = sucessos === 0;
+                downloadExcelBtn.disabled = sucessos === 0;
+                addToPlanilhaBtn.disabled = sucessos === 0 || !planilhaId.value.trim();
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                progressBar.classList.remove('bg-primary');
+                progressBar.classList.add('bg-danger');
+                progressText.textContent = `Erro: ${error.message}`;
+                console.error('Erro ao processar arquivos:', error);
+            });
+        }
+        
+        function showResults(data) {
+            // Mostrar container de resultados
+            resultsContainer.style.display = 'block';
+            
+            // Atualizar estatísticas
+            const { total, sucessos, falhas } = data.estatisticas;
+            resultsStats.innerHTML = `
+                <strong>Total de arquivos:</strong> ${total} | 
+                <strong>Processados com sucesso:</strong> ${sucessos} | 
+                <strong>Falhas:</strong> ${falhas}
+            `;
+            
+            // Limpar lista de resultados
+            resultsList.innerHTML = '';
+            
+            // Adicionar cada resultado
+            data.resultados.forEach(resultado => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                
+                const hasError = resultado.erro !== undefined;
+                
+                // Cabeçalho do resultado
+                const resultHeader = document.createElement('div');
+                resultHeader.className = 'result-header';
+                
+                const resultTitle = document.createElement('div');
+                resultTitle.className = 'result-title';
+                resultTitle.textContent = resultado.arquivo;
+                
+                const resultStatus = document.createElement('div');
+                resultStatus.className = `result-status ${hasError ? 'status-error' : 'status-success'}`;
+                resultStatus.textContent = hasError ? 'Erro' : 'Sucesso';
+                
+                resultHeader.appendChild(resultTitle);
+                resultHeader.appendChild(resultStatus);
+                resultItem.appendChild(resultHeader);
+                
+                // Se houver erro, mostrar mensagem de erro
+                if (hasError) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'alert alert-danger mt-2';
+                    errorMsg.textContent = resultado.erro;
+                    resultItem.appendChild(errorMsg);
+                } else {
+                    // Mostrar dados extraídos
+                    const resultData = document.createElement('div');
+                    resultData.className = 'result-data';
+                    
+                    // Campos a serem exibidos
+                    const fields = [
+                        { key: 'codigo_solicitacao', label: 'Código de Solicitação' },
+                        { key: 'cns', label: 'CNS' },
+                        { key: 'unidade_solicitante', label: 'Unidade Solicitante' },
+                        { key: 'unidade_executante', label: 'Unidade Executante' },
+                        { key: 'data_exame', label: 'Data do Exame' },
+                        { key: 'procedimento', label: 'Procedimento' }
+                    ];
+                    
+                    fields.forEach(field => {
+                        const dataItem = document.createElement('div');
+                        dataItem.className = 'data-item';
+                        
+                        const dataLabel = document.createElement('div');
+                        dataLabel.className = 'data-label';
+                        dataLabel.textContent = field.label;
+                        
+                        const dataValue = document.createElement('div');
+                        dataValue.className = 'data-value';
+                        const value = resultado[field.key];
+                        
+                        if (value === 'NÃO ENCONTRADO') {
+                            dataValue.className += ' not-found';
+                        }
+                        
+                        dataValue.textContent = value;
+                        
+                        dataItem.appendChild(dataLabel);
+                        dataItem.appendChild(dataValue);
+                        resultData.appendChild(dataItem);
+                    });
+                    
+                    resultItem.appendChild(resultData);
+                }
+                
+                resultsList.appendChild(resultItem);
+            });
+            
+            // Rolar para os resultados
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function downloadCsv() {
+            if (processedResults.length === 0) {
+                alert('Não há dados para baixar.');
+                return;
+            }
+            
+            // Filtrar apenas resultados bem-sucedidos
+            const sucessos = processedResults.filter(r => !r.erro);
+            
+            if (sucessos.length === 0) {
+                alert('Não há dados bem-sucedidos para baixar.');
+                return;
+            }
+            
+            // Enviar dados para o servidor para gerar CSV
+            fetch('/download/csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dados: sucessos })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.blob();
+            })
+            .then(blob => {
+                // Criar link para download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'dados_extraidos.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Erro ao baixar CSV:', error);
+                alert(`Erro ao baixar CSV: ${error.message}`);
+            });
+        }
+        
+        function downloadExcel() {
+            if (processedResults.length === 0) {
+                alert('Não há dados para baixar.');
+                return;
+            }
+            
+            // Filtrar apenas resultados bem-sucedidos
+            const sucessos = processedResults.filter(r => !r.erro);
+            
+            if (sucessos.length === 0) {
+                alert('Não há dados bem-sucedidos para baixar.');
+                return;
+            }
+            
+            // Enviar dados para o servidor para gerar Excel
+            fetch('/download/excel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dados: sucessos })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.blob();
+            })
+            .then(blob => {
+                // Criar link para download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'dados_extraidos.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Erro ao baixar Excel:', error);
+                alert(`Erro ao baixar Excel: ${error.message}`);
+            });
+        }
+        
+        function resetInterface() {
+            // Limpar arquivos selecionados
+            selectedFiles = [];
+            updateFileList();
+            updateButtons();
+            
+            // Esconder resultados
+            resultsContainer.style.display = 'none';
+            
+            // Esconder progresso
+            progressContainer.style.display = 'none';
+            
+            // Resetar barra de progresso
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressBar.classList.remove('bg-danger');
+            progressBar.classList.add('bg-primary');
+            
+            // Limpar resultados
+            processedResults = [];
+            
+            // Rolar para o topo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function checkPlanilhaId() {
+            addToPlanilhaBtn.disabled = !planilhaId.value.trim() || processedResults.filter(r => !r.erro).length === 0;
+        }
+        
+        function addToPlanilha() {
+            const id = planilhaId.value.trim();
+            
+            if (!id) {
+                alert('Informe o ID da planilha do Google Sheets.');
+                return;
+            }
+            
+            // Filtrar apenas resultados bem-sucedidos
+            const sucessos = processedResults.filter(r => !r.erro);
+            
+            if (sucessos.length === 0) {
+                alert('Não há dados bem-sucedidos para adicionar à planilha.');
+                return;
+            }
+            
+            // Desabilitar botão durante o processamento
+            addToPlanilhaBtn.disabled = true;
+            addToPlanilhaBtn.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Adicionando...';
+            
+            // Enviar dados para o servidor
+            fetch('/planilha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    dados: sucessos,
+                    id_planilha: id
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                alert(`${data.mensagem}\nRegistros adicionados: ${data.registros_adicionados}`);
+            })
+            .catch(error => {
+                console.error('Erro ao adicionar à planilha:', error);
+                alert(`Erro ao adicionar à planilha: ${error.message}`);
+            })
+            .finally(() => {
+                // Restaurar botão
+                addToPlanilhaBtn.disabled = false;
+                addToPlanilhaBtn.innerHTML = 'Adicionar à Planilha';
+            });
+        }
+        
+        function copyServiceAccount() {
+            const serviceAccountEmail = document.getElementById('serviceAccountEmail');
+            serviceAccountEmail.select();
+            document.execCommand('copy');
+            
+            const tooltip = document.getElementById('copyTooltip');
+            tooltip.innerHTML = "Copiado!";
+            
+            setTimeout(() => {
+                tooltip.innerHTML = "Copiar para área de transferência";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

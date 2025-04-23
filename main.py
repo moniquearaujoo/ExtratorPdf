@@ -1,26 +1,47 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-Extrator de Dados do SISREG III para Google Sheets
-Este script extrai informações de arquivos PDF do SISREG III e as envia para uma planilha do Google Sheets.
-Versão otimizada para lidar com múltiplos formatos de PDF do SISREG III.
-"""
-
 import os
 import re
-import json
-import subprocess
-import pytesseract
-from pdf2image import convert_from_path
-import gspread
-from google.oauth2.service_account import Credentials
+import PyPDF2
 import pandas as pd
+from flask import Flask, request, jsonify, render_template, send_from_directory
+from werkzeug.utils import secure_filename
+from flask_cors import CORS
+from google_sheets_integration_fix import adicionar_dados_planilha
+
+# Importar a função especializada para extrair município
+try:
+    from extract_municipio_module import extrair_municipio_residencia
+except ImportError:
+    # Função de fallback caso o módulo não seja encontrado
+    def extrair_municipio_residencia(texto):
+        # Implementação simplificada para garantir compatibilidade
+        cidade_estado_pattern = r'([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})'
+        match = re.search(cidade_estado_pattern, texto)
+        if match:
+            return match.group(0).strip()
+        return "NÃO ENCONTRADO"
+
+app = Flask(__name__)
+CORS(app)  # Habilita CORS para todas as rotas
+
+# Configurações
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'pdf'}
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB em bytes
+MAX_FILES = 10
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE * MAX_FILES  # Limite total para todos os arquivos
+
+# Criar pasta de uploads se não existir
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    """Verifica se o arquivo tem uma extensão permitida"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def extrair_texto_pdf(pdf_path):
     """
-    Extrai texto de um arquivo PDF usando múltiplos métodos.
-    Tenta primeiro pdftotext, depois PyPDF2 e, por último, OCR com Tesseract.
+    Extrai texto de um arquivo PDF usando apenas PyPDF2 com técnicas otimizadas.
     
     Args:
         pdf_path: Caminho para o arquivo PDF
@@ -28,39 +49,55 @@ def extrair_texto_pdf(pdf_path):
     Returns:
         String contendo o texto extraído do PDF
     """
-    # Tentativa 1: Usar pdftotext (mais rápido e preciso para PDFs digitais)
     try:
-        resultado = subprocess.run(['pdftotext', '-layout', pdf_path, '-'], 
-                                  capture_output=True, text=True)
-        if resultado.returncode == 0 and resultado.stdout.strip():
-            return resultado.stdout
-    except Exception as e:
-        print(f"Erro ao usar pdftotext: {e}")
-    
-    # Tentativa 2: Usar PyPDF2 (biblioteca Python pura, não requer dependências externas)
-    try:
-        import PyPDF2
+        # Método principal: PyPDF2 com configurações padrão
         texto_total = ""
         with open(pdf_path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
             for page_num in range(len(reader.pages)):
                 texto_total += reader.pages[page_num].extract_text() + "\n"
+        
+        # Se conseguiu extrair texto, retorna
         if texto_total.strip():
             return texto_total
-    except Exception as e:
-        print(f"Erro ao usar PyPDF2: {e}")
-    
-    # Tentativa 3: Fallback para o método OCR se os outros métodos falharem
-    try:
-        imagens = convert_from_path(pdf_path)
-        texto_total = ""
-        for imagem in imagens:
-            texto_total += pytesseract.image_to_string(imagem, lang='por')
-        return texto_total
-    except Exception as e:
-        print(f"Erro ao usar OCR: {e}")
+        
+        # Se não conseguiu extrair texto, tenta técnicas alternativas
+        texto_alternativo = ""
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            
+            # Técnica 1: Extrair texto com diferentes parâmetros
+            for page_num in range(len(reader.pages)):
+                # Tenta extrair texto com diferentes configurações
+                page = reader.pages[page_num]
+                try:
+                    # Tenta extrair texto ignorando LTFigures (pode ajudar em alguns PDFs)
+                    texto_alternativo += page.extract_text(extraction_mode="layout", layout_mode_space_vertically=True) + "\n"
+                except:
+                    # Fallback para o método padrão
+                    texto_alternativo += page.extract_text() + "\n"
+        
+        # Se conseguiu extrair texto com técnicas alternativas, retorna
+        if texto_alternativo.strip():
+            return texto_alternativo
+        
+        # Se ainda não conseguiu extrair texto, tenta extrair metadados
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            metadados = reader.metadata
+            if metadados:
+                texto_metadados = f"Título: {metadados.title or 'N/A'}\n"
+                texto_metadados += f"Autor: {metadados.author or 'N/A'}\n"
+                texto_metadados += f"Assunto: {metadados.subject or 'N/A'}\n"
+                texto_metadados += f"Criador: {metadados.creator or 'N/A'}\n"
+                texto_metadados += f"Produtor: {metadados.producer or 'N/A'}\n"
+                return texto_metadados
+        
+        # Se nenhuma técnica funcionou, retorna string vazia
         return ""
-
+    except Exception as e:
+        print(f"Erro ao extrair texto com PyPDF2: {e}")
+        return ""
 
 def extrair_dados(texto, nome_arquivo=""):
     """
@@ -74,14 +111,14 @@ def extrair_dados(texto, nome_arquivo=""):
     Returns:
         Dicionário com os dados extraídos (nunca retorna None)
     """
-    import os
     import re
+    import os
     
     # Inicializar o dicionário de dados com valores padrão
     dados = {
         "codigo_solicitacao": "NÃO ENCONTRADO",
         "cns": "NÃO ENCONTRADO",
-        "unidade_solicitante": "NÃO ENCONTRADO",
+        "unidade_solicitante": "NÃO ENCONTRADO",  # Manteremos o nome do campo para compatibilidade
         "unidade_executante": "NÃO ENCONTRADO",
         "data_exame": "NÃO ENCONTRADO",
         "procedimento": "NÃO ENCONTRADO"
@@ -116,7 +153,7 @@ def extrair_dados(texto, nome_arquivo=""):
             if match:
                 dados["cns"] = match.group(1).strip()
         
-        # NOVA CORREÇÃO: Adicionar padrões específicos para o código junto com a data
+        # Extrair código de solicitação
         codigo_patterns = [
             # NOVOS PADRÕES: Código seguido imediatamente por data
             # Busca por "Vaga Solicitada:Vaga Consumida:" seguido por código de 9 dígitos começando com 5 e data
@@ -179,19 +216,15 @@ def extrair_dados(texto, nome_arquivo=""):
                     if codigo.startswith('5') or not codigo_encontrado:
                         dados["codigo_solicitacao"] = codigo
                         codigo_encontrado = True
-                        print(f"Código de solicitação encontrado com o padrão: {pattern}")
-                        print(f"Código encontrado: {codigo}")
                         
                         # Se encontramos um código que começa com 5, paramos a busca
                         if codigo.startswith('5'):
                             break
         
-        # Extrair os demais campos
+        # Extrair unidade executante e data do exame
         outros_padroes = {
             "unidade_executante": r'UNIDADE\s*EXECUTANTE[\s\S]*?Nome\s*:\s*([^\r\n:]+)',
-            "unidade_solicitante": r'UNIDADE\s*SOLICITANTE[\s\S]*?Nome\s*:?\s*([^\r\n:]+)',
             "data_exame": r'Data\s*e\s*Hor[áa]rio\s*de\s*Atendimento\s*:?\s*([^\r\n]+)',
-            # MODIFICADO: Removido o padrão de procedimento, será tratado separadamente
         }
         
         # Aplicar cada padrão e armazenar os resultados
@@ -200,7 +233,86 @@ def extrair_dados(texto, nome_arquivo=""):
             if match:
                 dados[campo] = match.group(1).strip()
         
-        # NOVA FUNÇÃO: Limpar unidade executante para remover números e a palavra "CNES"
+        # MODIFICADO: Extrair município de residência usando a função especializada
+        municipio = extrair_municipio_residencia(texto)
+        if municipio and municipio != "NÃO ENCONTRADO":
+            dados["unidade_solicitante"] = municipio
+        else:
+            # Fallback para os padrões originais se a função especializada não encontrar o município
+            municipio_patterns = [
+                # Busca por padrão específico baseado na imagem do PDF
+                r'Bairro\s*:\s*([A-ZÀ-Ú\s]+)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})',
+                
+                # Busca por padrão específico baseado na imagem do PDF - versão alternativa
+                r'Bairro\s*:([^:]+?)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
+                
+                # Busca por "Município de Residência:" seguido de texto até "CEP:"
+                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
+                
+                # Busca por "Município de Residência:" seguido de texto até o próximo campo ou quebra de linha
+                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
+                
+                # Busca por "Município de Residência:" na seção de dados do paciente
+                r'DADOS\s+DO\s+PACIENTE[\s\S]*?Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
+                
+                # Busca por texto entre "Município de Residência:" e o próximo campo
+                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^:]+?)(?:\s*\w+\s*:|$)',
+                
+                # Busca por texto após "Município:" que geralmente aparece próximo a CEP
+                r'Munic[íi]pio\s*:\s*([^\r\n:]+?)(?:\s*CEP\s*:|$)'
+            ]
+            
+            municipio_encontrado = False
+            for pattern in municipio_patterns:
+                match = re.search(pattern, texto, re.IGNORECASE)
+                if match:
+                    # Verificar se o padrão tem dois grupos (caso do padrão com Bairro)
+                    if len(match.groups()) > 1 and 'Bairro' in pattern:
+                        municipio = match.group(2).strip()
+                    else:
+                        municipio = match.group(1).strip()
+                    
+                    if municipio:
+                        # Limpar o resultado para remover espaços extras e caracteres indesejados
+                        municipio = re.sub(r'\s+', ' ', municipio).strip()
+                        dados["unidade_solicitante"] = municipio
+                        municipio_encontrado = True
+                        break
+            
+            # Se não encontrou o município de residência, tentar padrões específicos da imagem do PDF
+            if not municipio_encontrado:
+                # Busca direta por "JOAO PESSOA - PB" ou variações
+                cidade_estado_patterns = [
+                    r'(JOAO\s+PESSOA\s*[-–]\s*PB)',
+                    r'(JOÃO\s+PESSOA\s*[-–]\s*PB)',
+                    r'(MANGABEIRA\s+JOAO\s+PESSOA\s*[-–]\s*PB)',
+                    r'(MANGABEIRA\s+JOÃO\s+PESSOA\s*[-–]\s*PB)'
+                ]
+                
+                for pattern in cidade_estado_patterns:
+                    match = re.search(pattern, texto, re.IGNORECASE)
+                    if match:
+                        dados["unidade_solicitante"] = match.group(1).strip()
+                        municipio_encontrado = True
+                        break
+                
+                # Se ainda não encontrou, buscar por padrões genéricos de cidade-estado
+                if not municipio_encontrado:
+                    # Busca por padrões de cidade seguida de estado (ex: JOÃO PESSOA - PB)
+                    cidade_estado_pattern = r'([A-ZÀ-Ú\s]+)\s*[-–]\s*([A-Z]{2})'
+                    match = re.search(cidade_estado_pattern, texto, re.IGNORECASE)
+                    if match:
+                        cidade_estado = match.group(0).strip()  # Captura "JOÃO PESSOA - PB" completo
+                        dados["unidade_solicitante"] = cidade_estado
+                        
+            # Verificação final: se ainda não encontrou, tentar extrair do texto completo
+            if dados["unidade_solicitante"] == "NÃO ENCONTRADO" or not dados["unidade_solicitante"]:
+                # Busca por "COMPLEXO REGULADOR" que pode ser a unidade solicitante
+                match_complexo = re.search(r'(COMPLEXO\s+REGULADOR[A-ZÀ-Ú\s]+)', texto, re.IGNORECASE)
+                if match_complexo:
+                    dados["unidade_solicitante"] = match_complexo.group(1).strip()
+        
+        # FUNÇÃO CORRIGIDA: Limpar unidade executante preservando o nome "HOSPITAL"
         def limpar_unidade_executante(texto):
             if not texto or texto == "NÃO ENCONTRADO":
                 return texto
@@ -210,9 +322,12 @@ def extrair_dados(texto, nome_arquivo=""):
             texto = re.sub(r'Cod\.?\s*CNES\s*:?', '', texto, flags=re.IGNORECASE)
             texto = re.sub(r'^Cod\.?\s+', '', texto, flags=re.IGNORECASE)
             
-            # Extrair apenas palavras (sem números)
-            palavras = re.findall(r'[A-Za-zÀ-ÖØ-öø-ÿ\s]+', texto)
-            texto = ' '.join(palavras)
+            # Remover "Endereço" do final do texto
+            texto = re.sub(r'\s*Endereço$', '', texto, flags=re.IGNORECASE)
+            
+            # Remover apenas números e caracteres especiais específicos
+            texto = re.sub(r'[0-9]', '', texto)  # Remover números
+            texto = re.sub(r'[^\w\sÀ-ÖØ-öø-ÿ]', '', texto)  # Manter letras, espaços e acentos
             
             # Normalizar espaços e remover espaços extras
             texto = re.sub(r'\s+', ' ', texto).strip()
@@ -243,636 +358,145 @@ def extrair_dados(texto, nome_arquivo=""):
                 r'Nome\s*:\s*([A-Z][A-Z\s]+)(?:[\s\S]*?Endere[çc]o\s*:)',
                 
                 # Busca por nome após "UNIDADE EXECUTANTE"
-                r'UNIDADE\s*EXECUTANTE[\s\S]*?([A-Z][A-Z\s]+(?:HOSPITAL|CLÍNICA|CENTRO|INSTITUTO)[^\r\n:]+)'
+                r'UNIDADE\s*EXECUTANTE[\s\S]*?([A-Z][A-Z\s]+(?:HOSPITAL|CLÍNICA|CENTRO|INSTITUTO)[A-Z\s]+)'
             ]
             
             for pattern in patterns:
                 match = re.search(pattern, texto, re.IGNORECASE)
                 if match:
-                    resultado = match.group(1).strip()
-                    # Limpar o resultado para remover números e a palavra "CNES"
-                    resultado = limpar_unidade_executante(resultado)
-                    if resultado and resultado != "NÃO ENCONTRADO":
-                        dados["unidade_executante"] = resultado
+                    unidade = match.group(1).strip()
+                    if unidade and len(unidade) > 3:
+                        dados["unidade_executante"] = limpar_unidade_executante(unidade)
                         break
-                    
-        # CORREÇÃO: Abordagens alternativas para unidade solicitante
-        # Verificar se a unidade solicitante é "Cod. CNES" ou contém "CNES"
-        if dados["unidade_solicitante"] == "Cod. CNES" or "CNES" in dados["unidade_solicitante"]:
-            # Tentar padrões alternativos para unidade solicitante
-            patterns = [
-                # Busca por texto "COMPLEXO REGULADOR" após "Videofonista:"
-                r'Videofonista\s*:\s*COMPLEXO\s+REGULADOR\s+ESTADUAL',
-                
-                # Busca por texto após "Videofonista:" limitado a palavras (sem números ou caracteres especiais)
-                r'Videofonista\s*:\s*([A-Z][A-Z\s]+)(?:\d)',
-                
-                # Busca por texto após "Op. Videofonista:" limitado a palavras
-                r'Op\.\s*Videofonista\s*:\s*([A-Z][A-Z\s]+)(?:\d)',
-                
-                # Busca por "COMPLEXO REGULADOR ESTADUAL" em qualquer lugar
-                r'(COMPLEXO\s+REGULADOR\s+ESTADUAL)',
-                
-                # Busca por texto após "Videofonista:" até o próximo número ou caractere especial
-                r'Videofonista\s*:\s*([^\r\n\d:]+)',
-                
-                # Fallback: busca por qualquer texto após "Videofonista:"
-                r'Videofonista\s*:\s*([^\r\n:]+)'
-            ]
+        
+        # Extrair procedimento
+        procedimento_patterns = [
+            # Busca por procedimento após "Procedimentos Autorizados:" e "Cod. Unificado:"
+            r'Procedimentos\s+Autorizados\s*:[\s\S]*?Cod\.\s*Unificado\s*:[\s\S]*?Cod\.\s*Interno\s*:\s*([^\r\n:]+)',
             
-            for pattern in patterns:
-                match = re.search(pattern, texto, re.IGNORECASE)
-                if match:
-                    # Se o padrão contém grupo de captura, use-o
-                    if '(' in pattern and ')' in pattern:
-                        resultado = match.group(1).strip()
-                    # Caso contrário, use "COMPLEXO REGULADOR ESTADUAL" como valor fixo
-                    else:
-                        resultado = "COMPLEXO REGULADOR ESTADUAL"
-                        
-                    if resultado and "Cod. CNES" not in resultado:
-                        # CORREÇÃO: Armazenar em unidade_solicitante em vez de unidade_executante
-                        dados["unidade_solicitante"] = resultado
-                        print(f"Unidade solicitante encontrada após Videofonista: {resultado}")
-                        break
-                        
-        # Abordagens alternativas para data do exame
-        if dados["data_exame"] == "NÃO ENCONTRADO":
-            patterns = [            
-                # Busca por padrão de data e hora
-                r'(\d{2}/\d{2}/\d{4}\s*\d{2}:\d{2})',
-                
-                # Busca por data após "Data de Atendimento:"
-                r'Data\s*de\s*Atendimento\s*:?\s*([^\r\n]+)'
-            ]
+            # Busca por procedimento após "Procedimentos Autorizados:"
+            r'Procedimentos\s+Autorizados\s*:[\s\S]*?([A-Z][A-Z\s\-]+)',
             
-            for pattern in patterns:
-                match = re.search(pattern, texto, re.IGNORECASE)
-                if match:
-                    data_encontrada = match.group(1).strip()
-                    dados["data_exame"] = data_encontrada
+            # Busca por procedimento após "CONSULTA EM" ou "EXAME DE"
+            r'(CONSULTA\s+EM\s+[A-Z\s\-]+|EXAME\s+DE\s+[A-Z\s\-]+)'
+        ]
+        
+        for pattern in procedimento_patterns:
+            match = re.search(pattern, texto, re.IGNORECASE)
+            if match:
+                procedimento = match.group(1).strip()
+                if procedimento and len(procedimento) > 3:
+                    dados["procedimento"] = procedimento
                     break
         
-        # Pós-processamento para garantir formato correto da data
-        if dados["data_exame"] != "NÃO ENCONTRADO":
-            # Verificar se a data está no formato DD/MM/AAAA
-            data_match = re.match(r'(\d{2}/\d{2}/\d{4})', dados["data_exame"])
-            if data_match:
-                dados["data_exame"] = data_match.group(1)
-            else:
-                # Tentar extrair qualquer data no formato DD/MM/AAAA do texto encontrado
-                data_match = re.search(r'(\d{2}/\d{2}/\d{4})', dados["data_exame"])
-                if data_match:
-                    dados["data_exame"] = data_match.group(1)
-
-        # NOVA IMPLEMENTAÇÃO: Extração e limpeza do procedimento
-        # Primeiro, extrair o procedimento bruto usando o padrão original
-        procedimento_bruto = "NÃO ENCONTRADO"
-        pattern = r'Procedimentos\s*Autorizados\s*:?[\s\S]*?([^\r\n]+?)(?:\s{2,}|\r|\n)'
-        match = re.search(pattern, texto, re.IGNORECASE)
-        if match:
-            procedimento_bruto = match.group(1).strip()
-            
-        # NOVA FUNÇÃO: Limpar procedimento para remover códigos e números
-        def limpar_procedimento(texto):
-            if not texto or texto == "NÃO ENCONTRADO":
-                return texto
-                
-            # Verificar se o texto contém "CONSULTA EM" e extrair o procedimento completo
-            consulta_match = re.search(r'(CONSULTA\s+EM\s+[A-ZÀ-Úa-zà-ú\s\-]+)', texto, flags=re.IGNORECASE)
-            if consulta_match:
-                return consulta_match.group(1).strip()
-                
-            # Verificar outros tipos de procedimentos
-            outros_procedimentos = [
-                r'(TOMOGRAFIA\s+[A-ZÀ-Úa-zà-ú\s\-]+)',
-                r'(RESSONANCIA\s+[A-ZÀ-Úa-zà-ú\s\-]+)',
-                r'(EXAME\s+[A-ZÀ-Úa-zà-ú\s\-]+)'
-            ]
-            
-            for pattern in outros_procedimentos:
-                match = re.search(pattern, texto, flags=re.IGNORECASE)
-                if match:
-                    return match.group(1).strip()
-            
-            # Remover "Cod. Unificado:", "Cod. Interno:" e variações
-            texto = re.sub(r'Cod\.\s*Unificado\s*:?', '', texto, flags=re.IGNORECASE)
-            texto = re.sub(r'Cod\.\s*Interno\s*:?', '', texto, flags=re.IGNORECASE)
-            
-            # Extrair apenas palavras e hífens (sem números)
-            palavras = re.findall(r'[A-ZÀ-Úa-zà-ú\s\-]+', texto)
-            texto = ' '.join(palavras)
-            
-            # Normalizar espaços e remover espaços extras
-            texto = re.sub(r'\s+', ' ', texto).strip()
-            
-            # Se o resultado for muito curto (menos de 3 caracteres), considerar como não encontrado
-            if len(texto) < 3:
-                return "NÃO ENCONTRADO"
-                
-            return texto
-        
-        # Aplicar a função de limpeza ao procedimento bruto
-        dados["procedimento"] = limpar_procedimento(procedimento_bruto)
-        
-        # Se ainda não encontrou o procedimento, tentar padrões alternativos
-        if dados["procedimento"] == "NÃO ENCONTRADO":
-            patterns = [
-                # Busca por CONSULTA EM seguido de texto
-                r'CONSULTA\s+EM\s+([A-ZÀ-Úa-zà-ú\s\-]+)',
-                
-                # Busca por TOMOGRAFIA seguido de texto
-                r'TOMOGRAFIA\s+([A-ZÀ-Úa-zà-ú\s\-]+)',
-                
-                # Busca por EXAME seguido de texto
-                r'EXAME\s+([A-ZÀ-Úa-zà-ú\s\-]+)'
-            ]
-            
-            for pattern in patterns:
-                match = re.search(pattern, texto, re.IGNORECASE)
-                if match:
-                    # Capturar o texto completo, não apenas o grupo
-                    inicio = match.start()
-                    fim = match.end()
-                    procedimento_completo = texto[inicio:fim].strip()
-                    dados["procedimento"] = procedimento_completo
-                    break
-                    
         return dados
         
     except Exception as e:
-        print(f"Erro ao extrair dados: {str(e)}")
-        # Retornar o dicionário com valores padrão em caso de erro, mas nunca None
+        print(f"Erro ao extrair dados: {e}")
         return dados
-
-
-def processar_pdfs(pasta):
-    """
-    Processa todos os arquivos PDF em uma pasta.
-    
-    Args:
-        pasta: Caminho para a pasta contendo os PDFs
-        
-    Returns:
-        Lista de dicionários com os dados extraídos de cada PDF
-    """
-    import os
-    
-    linhas = []
-    sucessos = 0
-    falhas = 0
-    
-    for nome_arquivo in os.listdir(pasta):
-        if nome_arquivo.endswith(".pdf"):
-            caminho_completo = os.path.join(pasta, nome_arquivo)
-            try:
-                print(f"Processando: {nome_arquivo}")
-                texto = extrair_texto_pdf(caminho_completo)
-                
-                if not texto or not texto.strip():
-                    print(f"AVISO: Não foi possível extrair texto do arquivo {nome_arquivo}")
-                    falhas += 1
-                    continue
-                
-                dados = extrair_dados(texto, nome_arquivo)
-                
-                # Verificar se dados é None antes de continuar
-                if dados is None:
-                    print(f"AVISO: Falha ao extrair dados de {nome_arquivo}")
-                    falhas += 1
-                    continue
-                
-                # Verificar se todos os campos obrigatórios foram encontrados
-                campos_obrigatorios = ["codigo_solicitacao", "cns", "unidade_executante", 
-                                     "unidade_solicitante", "data_exame", "procedimento"]
-                campos_faltantes = [campo for campo in campos_obrigatorios 
-                                  if campo not in dados or dados[campo] == "NÃO ENCONTRADO"]
-                
-                if campos_faltantes:
-                    print(f"AVISO: Campos não encontrados em {nome_arquivo}: {', '.join(campos_faltantes)}")
-                    # Adicionar mesmo com campos faltantes, mas marcar a falha
-                    linhas.append(dados)
-                    falhas += 1
-                else:
-                    linhas.append(dados)
-                    sucessos += 1
-                    print(f"Sucesso: Todos os campos extraídos de {nome_arquivo}")
-            except Exception as e:
-                print(f"ERRO ao processar {nome_arquivo}: {str(e)}")
-                falhas += 1
-    
-    print(f"Processamento concluído: {sucessos} arquivos processados com sucesso, {falhas} falhas.")
-    return linhas
-
-def configurar_google_sheets(caminho_credenciais, nome_planilha, nome_aba):
-    """
-    Configura a conexão com o Google Sheets.
-    
-    Args:
-        caminho_credenciais: Caminho para o arquivo de credenciais do Google
-        nome_planilha: Nome da planilha do Google Sheets
-        nome_aba: Nome da aba na planilha
-        
-    Returns:
-        Objeto worksheet do gspread ou None em caso de erro
-    """
-    try:
-        # Usar escopos mais amplos para garantir acesso
-        scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-        credentials = Credentials.from_service_account_file(caminho_credenciais, scopes=scopes)
-        client = gspread.authorize(credentials)
-        
-        # Tentar abrir a planilha existente
-        try:
-            planilha = client.open(nome_planilha)
-        except gspread.exceptions.SpreadsheetNotFound:
-            print(f"Planilha '{nome_planilha}' não encontrada. Criando nova planilha...")
-            planilha = client.create(nome_planilha)
-            # Compartilhar com o email do usuário (opcional)
-            # planilha.share('email_do_usuario@gmail.com', perm_type='user', role='writer')
-        
-        # Tentar abrir a aba existente ou criar nova
-        try:
-            aba = planilha.worksheet(nome_aba)
-        except gspread.exceptions.WorksheetNotFound:
-            print(f"Aba '{nome_aba}' não encontrada. Criando nova aba...")
-            aba = planilha.add_worksheet(title=nome_aba, rows=1000, cols=20)
-        
-        return aba
-    except Exception as e:
-        print(f"Erro ao configurar Google Sheets: {str(e)}")
-        return None
-
-
-def enviar_para_sheets(dados, aba):
-    """
-    Versão corrigida da função enviar_para_sheets que garante que novos registros
-    sejam adicionados após a última linha com dados, não após o cabeçalho.
-    
-    Args:
-        dados: Lista de dicionários com os dados extraídos
-        aba: Objeto worksheet do gspread
-        
-    Returns:
-        Boolean indicando sucesso ou falha
-    """
-    if not dados:
-        print("Sem dados para enviar.")
-        return False
-    
-    if not aba:
-        print("Problema com a planilha.")
-        return False
-    
-    try:
-        # Verificar se a planilha já tem cabeçalhos
-        headers = aba.row_values(1)
-        if not headers:
-            print("ERRO: A planilha não possui cabeçalhos. Certifique-se de que a planilha tenha a estrutura correta.")
-            return False
-        
-        # Mapear os índices das colunas que precisamos preencher
-        colunas_necessarias = {
-            "COD. SOLICITAÇÃO": "codigo_solicitacao",
-            "CNS DO PACIENTE": "cns",
-            "UNID. SOLICITANTE": "unidade_solicitante",
-            "UNID. EXECUTANTE": "unidade_executante",
-            "DATA DO EXAME/CONSULTA": "data_exame",
-            "CONSULTA/EXAME/ESPECIALIDADE": "procedimento"
-        }
-        
-        mapeamento_colunas = {}
-        for i, header in enumerate(headers):
-            if header in colunas_necessarias:
-                mapeamento_colunas[colunas_necessarias[header]] = i
-        
-        # Verificar se todas as colunas necessárias foram encontradas
-        colunas_faltantes = [col for col in colunas_necessarias.keys() 
-                           if colunas_necessarias[col] not in mapeamento_colunas]
-        if colunas_faltantes:
-            print(f"AVISO: As seguintes colunas não foram encontradas na planilha: {', '.join(colunas_faltantes)}")
-        
-        # Obter todas as linhas existentes para verificar duplicatas e encontrar a última linha com dados
-        todas_linhas = aba.get_all_values()
-        codigos_existentes = set()
-        
-        # Encontrar a última linha com dados
-        ultima_linha = 0  # Começar do início
-        for i in range(len(todas_linhas)):
-            # Verificar se a linha tem algum conteúdo
-            if any(todas_linhas[i]):
-                ultima_linha = i
-        
-        # Índice da coluna do código de solicitação
-        if "codigo_solicitacao" in mapeamento_colunas:
-            idx_codigo = mapeamento_colunas["codigo_solicitacao"]
-            # Começar do índice 1 para pular o cabeçalho
-            for i in range(1, len(todas_linhas)):
-                if i < len(todas_linhas) and idx_codigo < len(todas_linhas[i]) and todas_linhas[i][idx_codigo]:
-                    codigos_existentes.add(todas_linhas[i][idx_codigo])
-        
-        # Preparar os dados para adicionar à planilha
-        novas_linhas = []
-        
-        for item in dados:
-            # Verificar se o item é None ou não tem o campo codigo_solicitacao
-            if item is None or "codigo_solicitacao" not in item:
-                print(f"AVISO: Registro inválido encontrado. Pulando.")
-                continue
-                
-            codigo = item.get("codigo_solicitacao", "")
-            
-            # Pular registros sem código de solicitação válido
-            if codigo == "NÃO ENCONTRADO" or not codigo:
-                print(f"AVISO: Registro sem código de solicitação válido. Pulando.")
-                continue
-            
-            # Verificar se o código já existe na planilha
-            if codigo in codigos_existentes:
-                print(f"AVISO: Código de solicitação {codigo} já existe na planilha. Pulando.")
-                continue
-            
-            # Criar uma nova linha com valores vazios
-            nova_linha = [""] * len(headers)
-            
-            # Preencher apenas as colunas que precisamos
-            for campo_dados, indice_coluna in mapeamento_colunas.items():
-                if indice_coluna < len(nova_linha):
-                    nova_linha[indice_coluna] = item.get(campo_dados, "")
-            
-            novas_linhas.append(nova_linha)
-        
-        # Adicionar as novas linhas à planilha
-        if novas_linhas:
-            # CORREÇÃO: Usar o método update para adicionar dados após a última linha com dados
-            # Isso garante que os novos registros sejam adicionados após todos os dados existentes
-            inicio_celula = f"A{ultima_linha + 2}"  # +2 porque: +1 para índice começar em 1, +1 para ir para a próxima linha
-            aba.update(inicio_celula, novas_linhas, value_input_option="USER_ENTERED")
-            print(f"Dados enviados com sucesso! {len(novas_linhas)} registros adicionados a partir da linha {ultima_linha + 2}.")
-            return True
-        else:
-            print("Nenhum novo registro para adicionar à planilha.")
-            return True
-    except Exception as e:
-        print(f"Erro ao enviar dados para o Google Sheets: {str(e)}")
-        return False
-    
-# Método alternativo (caso o primeiro não funcione com sua versão do gspread)
-def enviar_para_sheets_alternativo(dados, aba):
-    """
-    Método alternativo que identifica explicitamente a última linha preenchida
-    e adiciona novos registros após essa linha.
-    
-    Args:
-        dados: Lista de dicionários com os dados extraídos
-        aba: Objeto worksheet do gspread
-        
-    Returns:
-        Boolean indicando sucesso ou falha
-    """
-    if not dados:
-        print("Sem dados para enviar.")
-        return False
-    
-    if not aba:
-        print("Problema com a planilha.")
-        return False
-    
-    try:
-        # Verificar se a planilha já tem cabeçalhos
-        headers = aba.row_values(1)
-        if not headers:
-            print("ERRO: A planilha não possui cabeçalhos. Certifique-se de que a planilha tenha a estrutura correta.")
-            return False
-        
-        # Mapear os índices das colunas que precisamos preencher
-        colunas_necessarias = {
-            "COD. SOLICITAÇÃO": "codigo_solicitacao",
-            "CNS DO PACIENTE": "cns",
-            "UNID. SOLICITANTE": "unidade_solicitante",
-            "UNID. EXECUTANTE": "unidade_executante",
-            "DATA DO EXAME/CONSULTA": "data_exame",
-            "CONSULTA/EXAME/ESPECIALIDADE": "procedimento"
-        }
-        
-        mapeamento_colunas = {}
-        for i, header in enumerate(headers):
-            if header in colunas_necessarias:
-                mapeamento_colunas[colunas_necessarias[header]] = i
-        
-        # Verificar se todas as colunas necessárias foram encontradas
-        colunas_faltantes = [col for col in colunas_necessarias.keys() 
-                           if colunas_necessarias[col] not in mapeamento_colunas]
-        if colunas_faltantes:
-            print(f"AVISO: As seguintes colunas não foram encontradas na planilha: {', '.join(colunas_faltantes)}")
-        
-        # Obter todas as linhas existentes para verificar duplicatas
-        todas_linhas = aba.get_all_values()
-        codigos_existentes = set()
-        
-        # Encontrar a última linha preenchida
-        ultima_linha = 1  # Começar após o cabeçalho
-        for i in range(1, len(todas_linhas)):
-            # Verificar se a linha tem algum conteúdo
-            if any(todas_linhas[i]):
-                ultima_linha = i + 1  # +1 porque queremos a próxima linha após a última preenchida
-        
-        # Índice da coluna do código de solicitação
-        if "codigo_solicitacao" in mapeamento_colunas:
-            idx_codigo = mapeamento_colunas["codigo_solicitacao"]
-            # Começar do índice 1 para pular o cabeçalho
-            for i in range(1, len(todas_linhas)):
-                if i < len(todas_linhas) and idx_codigo < len(todas_linhas[i]) and todas_linhas[i][idx_codigo]:
-                    codigos_existentes.add(todas_linhas[i][idx_codigo])
-        
-        # Preparar os dados para adicionar à planilha
-        novas_linhas = []
-        
-        for item in dados:
-            # Verificar se o item é None ou não tem o campo codigo_solicitacao
-            if item is None or "codigo_solicitacao" not in item:
-                print(f"AVISO: Registro inválido encontrado. Pulando.")
-                continue
-                
-            codigo = item.get("codigo_solicitacao", "")
-            
-            # Pular registros sem código de solicitação válido
-            if codigo == "NÃO ENCONTRADO" or not codigo:
-                print(f"AVISO: Registro sem código de solicitação válido. Pulando.")
-                continue
-            
-            # Verificar se o código já existe na planilha
-            if codigo in codigos_existentes:
-                print(f"AVISO: Código de solicitação {codigo} já existe na planilha. Pulando.")
-                continue
-            
-            # Criar uma nova linha com valores vazios
-            nova_linha = [""] * len(headers)
-            
-            # Preencher apenas as colunas que precisamos
-            for campo_dados, indice_coluna in mapeamento_colunas.items():
-                if indice_coluna < len(nova_linha):
-                    nova_linha[indice_coluna] = item.get(campo_dados, "")
-            
-            novas_linhas.append(nova_linha)
-        
-        # Adicionar as novas linhas à planilha
-        if novas_linhas:
-            # CORREÇÃO: Usar o método update para adicionar dados a partir da última linha preenchida
-            # Isso garante que não haverá sobreposição
-            inicio_celula = f"A{ultima_linha + 1}"  # Exemplo: A2, A10, etc.
-            aba.update(inicio_celula, novas_linhas, value_input_option="USER_ENTERED")
-            print(f"Dados enviados com sucesso! {len(novas_linhas)} registros adicionados a partir da linha {ultima_linha + 1}.")
-            return True
-        else:
-            print("Nenhum novo registro para adicionar à planilha.")
-            return True
-    except Exception as e:
-        print(f"Erro ao enviar dados para o Google Sheets: {str(e)}")
-        return False
-
-
-def carregar_configuracao(arquivo_config='config.json'):
-    """
-    Carrega configurações do arquivo config.json.
-    
-    Args:
-        arquivo_config: Caminho para o arquivo de configuração
-        
-    Returns:
-        Dicionário com as configurações
-    """
-    # Valores padrão
-    config = {
-        "pasta_pdfs": "pdfs",
-        "arquivo_credenciais": "credentials.json",
-        "nome_planilha": "CENSO",
-        "nome_aba": "geral"
-    }
-    
-    # Tentar carregar do arquivo de configuração
-    try:
-        if os.path.exists(arquivo_config):
-            with open(arquivo_config, 'r') as f:
-                config_carregada = json.load(f)
-                config.update(config_carregada)
-    except Exception as e:
-        print(f"Erro ao carregar configuração: {str(e)}")
-    
-    return config
-
-def testar_extracao(pdf_path):
-    """
-    Função para testar a extração de um único arquivo PDF.
-    
-    Args:
-        pdf_path: Caminho para o arquivo PDF de teste
-        
-    Returns:
-        Dicionário com os dados extraídos
-    """
-    print(f"Testando extração do arquivo: {pdf_path}")
-    texto = extrair_texto_pdf(pdf_path)
-    
-    if not texto.strip():
-        print("ERRO: Não foi possível extrair texto do PDF.")
-        return {}
-    
-    nome_arquivo = os.path.basename(pdf_path)
-    dados = extrair_dados(texto, nome_arquivo)
-    
-    print("\nResultados da extração:")
-    for campo, valor in dados.items():
-        print(f"{campo}: {valor}")
-    
-    return dados
-
-def verificar_dependencias():
-    """
-    Verifica se as dependências necessárias estão instaladas.
-    
-    Returns:
-        Boolean indicando se todas as dependências estão disponíveis
-    """
-    dependencias_ok = True
-    
-    # Verificar PyPDF2
-    try:
-        import PyPDF2
-        print("✓ PyPDF2 está instalado")
-    except ImportError:
-        print("✗ PyPDF2 não está instalado. Instalando...")
-        try:
-            subprocess.check_call(["pip", "install", "PyPDF2"])
-            print("✓ PyPDF2 instalado com sucesso")
-        except:
-            print("✗ Falha ao instalar PyPDF2")
-            dependencias_ok = False
-    
-    # Verificar pdftotext (poppler-utils)
-    try:
-        resultado = subprocess.run(["pdftotext", "-v"], capture_output=True, stderr=subprocess.STDOUT, text=True)
-        if "pdftotext version" in resultado.stdout:
-            print("✓ poppler-utils (pdftotext) está instalado")
-        else:
-            raise Exception("Versão não encontrada")
-    except:
-        print("✗ poppler-utils não está instalado ou não está no PATH")
-        print("  Para instalar:")
-        print("  - Ubuntu/Debian: sudo apt-get install poppler-utils")
-        print("  - Windows: Baixe em https://github.com/oschwartz10612/poppler-windows/releases")
-        dependencias_ok = False
-    
-    # Verificar Tesseract OCR
-    try:
-        resultado = subprocess.run(["tesseract", "--version"], capture_output=True, text=True)
-        if resultado.returncode == 0:
-            print("✓ Tesseract OCR está instalado")
-        else:
-            raise Exception("Comando retornou erro")
-    except:
-        print("✗ Tesseract OCR não está instalado ou não está no PATH")
-        print("  Para instalar:")
-        print("  - Ubuntu/Debian: sudo apt-get install tesseract-ocr tesseract-ocr-por")
-        print("  - Windows: Baixe em https://github.com/UB-Mannheim/tesseract/wiki")
-        dependencias_ok = False
-    
-    return dependencias_ok
-
-
-from flask import Flask, jsonify
-import os
-
-app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # Executa o processamento ao acessar a rota
-    config = carregar_configuracao()
-    
-    if not os.path.exists(config["pasta_pdfs"]):
-        os.makedirs(config["pasta_pdfs"])
-    
-    dados_extraidos = processar_pdfs(config["pasta_pdfs"])
-    
-    if not dados_extraidos:
-        return jsonify({"mensagem": "Nenhum dado extraído dos PDFs."})
+    return render_template('index.html')
 
-    # Salvar localmente em CSV
-    df = pd.DataFrame(dados_extraidos)
-    df.to_csv("dados_extraidos.csv", index=False)
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # Verificar se a requisição contém arquivos
+    if 'files[]' not in request.files:
+        return jsonify({"erro": "Nenhum arquivo enviado"}), 400
     
-    if os.path.exists(config["arquivo_credenciais"]):
-        aba = configurar_google_sheets(
-            config["arquivo_credenciais"], 
-            config["nome_planilha"], 
-            config["nome_aba"]
-        )
-        if aba:
-            enviar_para_sheets(dados_extraidos, aba)
+    files = request.files.getlist('files[]')
     
-    return jsonify({"mensagem": "Processamento concluído com sucesso!", "registros": dados_extraidos})
+    # Verificar se há arquivos selecionados
+    if not files or files[0].filename == '':
+        return jsonify({"erro": "Nenhum arquivo selecionado"}), 400
+    
+    # Verificar se o número de arquivos não excede o limite
+    if len(files) > MAX_FILES:
+        return jsonify({"erro": f"Número máximo de arquivos excedido. Limite: {MAX_FILES}"}), 400
+    
+    # Obter o ID da planilha do Google Sheets
+    id_planilha = request.form.get('id_planilha', '')
+    if not id_planilha:
+        return jsonify({"erro": "ID da planilha do Google Sheets não fornecido"}), 400
+    
+    # Processar cada arquivo
+    resultados = []
+    dados_extraidos = []
+    
+    for file in files:
+        # Verificar se o arquivo tem uma extensão permitida
+        if not allowed_file(file.filename):
+            resultados.append({
+                "arquivo": file.filename,
+                "erro": "Tipo de arquivo não permitido. Apenas PDFs são aceitos."
+            })
+            continue
+        
+        # Salvar o arquivo
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        try:
+            file.save(file_path)
+            
+            # Extrair texto do PDF
+            texto = extrair_texto_pdf(file_path)
+            
+            if not texto:
+                resultados.append({
+                    "arquivo": file.filename,
+                    "erro": "Não foi possível extrair texto do PDF."
+                })
+                continue
+            
+            # Extrair dados do texto
+            dados = extrair_dados(texto, file.filename)
+            
+            # Adicionar à lista de dados extraídos
+            dados_extraidos.append(dados)
+            
+            # Adicionar ao resultado
+            resultados.append({
+                "arquivo": file.filename,
+                "dados": dados
+            })
+            
+        except Exception as e:
+            resultados.append({
+                "arquivo": file.filename,
+                "erro": f"Erro ao processar arquivo: {str(e)}"
+            })
+    
+    # Adicionar dados à planilha do Google Sheets
+    if dados_extraidos:
+        try:
+            resultado_planilha = adicionar_dados_planilha(id_planilha, dados_extraidos)
+            
+            # Verificar se houve erro na adição à planilha
+            if "erro" in resultado_planilha:
+                return jsonify({
+                    "resultados": resultados,
+                    "erro_planilha": resultado_planilha["erro"]
+                }), 500
+            
+            # Adicionar resultado da planilha à resposta
+            return jsonify({
+                "resultados": resultados,
+                "resultado_planilha": resultado_planilha
+            })
+            
+        except Exception as e:
+            return jsonify({
+                "resultados": resultados,
+                "erro_planilha": f"Erro ao adicionar dados à planilha: {str(e)}"
+            }), 500
+    
+    return jsonify({"resultados": resultados})
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True, host='0.0.0.0', port=5000)

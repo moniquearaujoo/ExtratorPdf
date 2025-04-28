@@ -1,0 +1,30 @@
+{
+  "resultados": [
+    {
+      "arquivo": "WEVERTON .pdf",
+      "dados": {
+        "codigo_solicitacao": "586605885",
+        "cns": "206111178560008",
+        "unidade_solicitante": "JOAO PESSOA - PB",
+        "unidade_executante": "DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA",
+        "data_exame": "VINICIUS TIBURTINO CHAVES OLIVEIRASEX ● 14/03/2025 ● 07:00hrs",
+        "procedimento": "CONSULTA EM ORTOPEDIA - JOELHO03010100720016009Data da Extração dos Dados"
+      }
+    }
+  ],
+  "dados_extraidos": [
+    {
+      "codigo_solicitacao": "586605885",
+      "cns": "206111178560008",
+      "unidade_solicitante": "JOAO PESSOA - PB",
+      "unidade_executante": "DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA",
+      "data_exame": "VINICIUS TIBURTINO CHAVES OLIVEIRASEX ● 14/03/2025 ● 07:00hrs",
+      "procedimento": "CONSULTA EM ORTOPEDIA - JOELHO03010100720016009Data da Extração dos Dados"
+    }
+  ],
+  "estatisticas": {
+    "total": 1,
+    "sucesso": 1,
+    "erro": 0
+  }
+}

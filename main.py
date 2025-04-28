@@ -7,18 +7,6 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from google_sheets_integration_fix import adicionar_dados_planilha
 
-# Importar a função especializada para extrair município
-try:
-    from extract_municipio_module import extrair_municipio_residencia
-except ImportError:
-    # Função de fallback caso o módulo não seja encontrado
-    def extrair_municipio_residencia(texto):
-        # Implementação simplificada para garantir compatibilidade
-        cidade_estado_pattern = r'([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})'
-        match = re.search(cidade_estado_pattern, texto)
-        if match:
-            return match.group(0).strip()
-        return "NÃO ENCONTRADO"
 
 app = Flask(__name__)
 CORS(app)  # Habilita CORS para todas as rotas
@@ -233,84 +221,80 @@ def extrair_dados(texto, nome_arquivo=""):
             if match:
                 dados[campo] = match.group(1).strip()
         
-        # MODIFICADO: Extrair município de residência usando a função especializada
-        municipio = extrair_municipio_residencia(texto)
-        if municipio and municipio != "NÃO ENCONTRADO":
-            dados["unidade_solicitante"] = municipio
-        else:
-            # Fallback para os padrões originais se a função especializada não encontrar o município
-            municipio_patterns = [
-                # Busca por padrão específico baseado na imagem do PDF
-                r'Bairro\s*:\s*([A-ZÀ-Ú\s]+)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})',
+        # MODIFICADO: Extrair município de residência (substituindo unidade_solicitante)
+        # Primeiro, tentar encontrar o padrão específico para município de residência
+        municipio_patterns = [
+            # Busca por padrão específico baseado na imagem do PDF
+            r'Bairro\s*:\s*([A-ZÀ-Ú\s]+)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})',
+            
+            # Busca por padrão específico baseado na imagem do PDF - versão alternativa
+            r'Bairro\s*:([^:]+?)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
+            
+            # Busca por "Município de Residência:" seguido de texto até "CEP:"
+            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
+            
+            # Busca por "Município de Residência:" seguido de texto até o próximo campo ou quebra de linha
+            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
+            
+            # Busca por "Município de Residência:" na seção de dados do paciente
+            r'DADOS\s+DO\s+PACIENTE[\s\S]*?Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
+            
+            # Busca por texto entre "Município de Residência:" e o próximo campo
+            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^:]+?)(?:\s*\w+\s*:|$)',
+            
+            # Busca por texto após "Município:" que geralmente aparece próximo a CEP
+            r'Munic[íi]pio\s*:\s*([^\r\n:]+?)(?:\s*CEP\s*:|$)'
+        ]
+        
+        municipio_encontrado = False
+        for pattern in municipio_patterns:
+            match = re.search(pattern, texto, re.IGNORECASE)
+            if match:
+                # Verificar se o padrão tem dois grupos (caso do padrão com Bairro)
+                if len(match.groups()) > 1 and 'Bairro' in pattern:
+                    municipio = match.group(2).strip()
+                else:
+                    municipio = match.group(1).strip()
                 
-                # Busca por padrão específico baseado na imagem do PDF - versão alternativa
-                r'Bairro\s*:([^:]+?)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
-                
-                # Busca por "Município de Residência:" seguido de texto até "CEP:"
-                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
-                
-                # Busca por "Município de Residência:" seguido de texto até o próximo campo ou quebra de linha
-                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
-                
-                # Busca por "Município de Residência:" na seção de dados do paciente
-                r'DADOS\s+DO\s+PACIENTE[\s\S]*?Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
-                
-                # Busca por texto entre "Município de Residência:" e o próximo campo
-                r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^:]+?)(?:\s*\w+\s*:|$)',
-                
-                # Busca por texto após "Município:" que geralmente aparece próximo a CEP
-                r'Munic[íi]pio\s*:\s*([^\r\n:]+?)(?:\s*CEP\s*:|$)'
+                if municipio:
+                    # Limpar o resultado para remover espaços extras e caracteres indesejados
+                    municipio = re.sub(r'\s+', ' ', municipio).strip()
+                    dados["unidade_solicitante"] = municipio
+                    municipio_encontrado = True
+                    break
+        
+        # Se não encontrou o município de residência, tentar padrões específicos da imagem do PDF
+        if not municipio_encontrado:
+            # Busca direta por "JOAO PESSOA - PB" ou variações
+            cidade_estado_patterns = [
+                r'(JOAO\s+PESSOA\s*[-–]\s*PB)',
+                r'(JOÃO\s+PESSOA\s*[-–]\s*PB)',
+                r'(MANGABEIRA\s+JOAO\s+PESSOA\s*[-–]\s*PB)',
+                r'(MANGABEIRA\s+JOÃO\s+PESSOA\s*[-–]\s*PB)'
             ]
             
-            municipio_encontrado = False
-            for pattern in municipio_patterns:
+            for pattern in cidade_estado_patterns:
                 match = re.search(pattern, texto, re.IGNORECASE)
                 if match:
-                    # Verificar se o padrão tem dois grupos (caso do padrão com Bairro)
-                    if len(match.groups()) > 1 and 'Bairro' in pattern:
-                        municipio = match.group(2).strip()
-                    else:
-                        municipio = match.group(1).strip()
-                    
-                    if municipio:
-                        # Limpar o resultado para remover espaços extras e caracteres indesejados
-                        municipio = re.sub(r'\s+', ' ', municipio).strip()
-                        dados["unidade_solicitante"] = municipio
-                        municipio_encontrado = True
-                        break
+                    dados["unidade_solicitante"] = match.group(1).strip()
+                    municipio_encontrado = True
+                    break
             
-            # Se não encontrou o município de residência, tentar padrões específicos da imagem do PDF
+            # Se ainda não encontrou, buscar por padrões genéricos de cidade-estado
             if not municipio_encontrado:
-                # Busca direta por "JOAO PESSOA - PB" ou variações
-                cidade_estado_patterns = [
-                    r'(JOAO\s+PESSOA\s*[-–]\s*PB)',
-                    r'(JOÃO\s+PESSOA\s*[-–]\s*PB)',
-                    r'(MANGABEIRA\s+JOAO\s+PESSOA\s*[-–]\s*PB)',
-                    r'(MANGABEIRA\s+JOÃO\s+PESSOA\s*[-–]\s*PB)'
-                ]
-                
-                for pattern in cidade_estado_patterns:
-                    match = re.search(pattern, texto, re.IGNORECASE)
-                    if match:
-                        dados["unidade_solicitante"] = match.group(1).strip()
-                        municipio_encontrado = True
-                        break
-                
-                # Se ainda não encontrou, buscar por padrões genéricos de cidade-estado
-                if not municipio_encontrado:
-                    # Busca por padrões de cidade seguida de estado (ex: JOÃO PESSOA - PB)
-                    cidade_estado_pattern = r'([A-ZÀ-Ú\s]+)\s*[-–]\s*([A-Z]{2})'
-                    match = re.search(cidade_estado_pattern, texto, re.IGNORECASE)
-                    if match:
-                        cidade_estado = match.group(0).strip()  # Captura "JOÃO PESSOA - PB" completo
-                        dados["unidade_solicitante"] = cidade_estado
-                        
-            # Verificação final: se ainda não encontrou, tentar extrair do texto completo
-            if dados["unidade_solicitante"] == "NÃO ENCONTRADO" or not dados["unidade_solicitante"]:
-                # Busca por "COMPLEXO REGULADOR" que pode ser a unidade solicitante
-                match_complexo = re.search(r'(COMPLEXO\s+REGULADOR[A-ZÀ-Ú\s]+)', texto, re.IGNORECASE)
-                if match_complexo:
-                    dados["unidade_solicitante"] = match_complexo.group(1).strip()
+                # Busca por padrões de cidade seguida de estado (ex: JOÃO PESSOA - PB)
+                cidade_estado_pattern = r'([A-ZÀ-Ú\s]+)\s*[-–]\s*([A-Z]{2})'
+                match = re.search(cidade_estado_pattern, texto, re.IGNORECASE)
+                if match:
+                    cidade_estado = match.group(0).strip()  # Captura "JOÃO PESSOA - PB" completo
+                    dados["unidade_solicitante"] = cidade_estado
+                    
+        # Verificação final: se ainda não encontrou, tentar extrair do texto completo
+        if dados["unidade_solicitante"] == "NÃO ENCONTRADO" or not dados["unidade_solicitante"]:
+            # Busca por "COMPLEXO REGULADOR" que pode ser a unidade solicitante
+            match_complexo = re.search(r'(COMPLEXO\s+REGULADOR[A-ZÀ-Ú\s]+)', texto, re.IGNORECASE)
+            if match_complexo:
+                dados["unidade_solicitante"] = match_complexo.group(1).strip()
         
         # FUNÇÃO CORRIGIDA: Limpar unidade executante preservando o nome "HOSPITAL"
         def limpar_unidade_executante(texto):
@@ -358,145 +342,322 @@ def extrair_dados(texto, nome_arquivo=""):
                 r'Nome\s*:\s*([A-Z][A-Z\s]+)(?:[\s\S]*?Endere[çc]o\s*:)',
                 
                 # Busca por nome após "UNIDADE EXECUTANTE"
-                r'UNIDADE\s*EXECUTANTE[\s\S]*?([A-Z][A-Z\s]+(?:HOSPITAL|CLÍNICA|CENTRO|INSTITUTO)[A-Z\s]+)'
+                r'UNIDADE\s*EXECUTANTE[\s\S]*?([A-Z][A-Z\s]+(?:HOSPITAL|CLÍNICA|CENTRO|INSTITUTO)[^\r\n:]+)'
             ]
             
             for pattern in patterns:
                 match = re.search(pattern, texto, re.IGNORECASE)
                 if match:
-                    unidade = match.group(1).strip()
-                    if unidade and len(unidade) > 3:
-                        dados["unidade_executante"] = limpar_unidade_executante(unidade)
+                    # CORREÇÃO: Capturar o texto completo para preservar "HOSPITAL"
+                    if "HOSPITAL" in pattern:
+                        resultado = "HOSPITAL " + match.group(1).strip()
+                    else:
+                        resultado = match.group(1).strip()
+                    
+                    # Limpar o resultado para remover números e a palavra "CNES"
+                    resultado = limpar_unidade_executante(resultado)
+                    if resultado and resultado != "NÃO ENCONTRADO":
+                        dados["unidade_executante"] = resultado
                         break
-        
-        # Extrair procedimento
-        procedimento_patterns = [
-            # Busca por procedimento após "Procedimentos Autorizados:" e "Cod. Unificado:"
-            r'Procedimentos\s+Autorizados\s*:[\s\S]*?Cod\.\s*Unificado\s*:[\s\S]*?Cod\.\s*Interno\s*:\s*([^\r\n:]+)',
             
-            # Busca por procedimento após "Procedimentos Autorizados:"
-            r'Procedimentos\s+Autorizados\s*:[\s\S]*?([A-Z][A-Z\s\-]+)',
+            # NOVA CORREÇÃO: Buscar diretamente por padrões de hospital no texto
+            if dados["unidade_executante"] == "NÃO ENCONTRADO" or not dados["unidade_executante"]:
+                hospital_patterns = [
+                    r'HOSPITAL\s+([A-ZÀ-Úa-zà-ú\s]+)',
+                    r'HOSPITAL\s+DE\s+([A-ZÀ-Úa-zà-ú\s]+)',
+                    r'HOSPITAL\s+([A-ZÀ-Úa-zà-ú\s]+)(?:[\s\S]*?Endere[çc]o\s*:)'
+                ]
+                
+                for pattern in hospital_patterns:
+                    match = re.search(pattern, texto, re.IGNORECASE)
+                    if match:
+                        # Capturar o texto completo incluindo "HOSPITAL"
+                        inicio = match.start()
+                        fim = match.end()
+                        hospital_completo = texto[inicio:fim].strip()
+                        
+                        # Limpar o resultado
+                        hospital_completo = limpar_unidade_executante(hospital_completo)
+                        if hospital_completo and hospital_completo != "NÃO ENCONTRADO":
+                            dados["unidade_executante"] = hospital_completo
+                            break
+                        
+        # Abordagens alternativas para data do exame
+        if dados["data_exame"] == "NÃO ENCONTRADO":
+            patterns = [            
+                # Busca por padrão de data e hora
+                r'(\d{2}/\d{2}/\d{4}\s*\d{2}:\d{2})',
+                
+                # Busca por data após "Data de Atendimento:"
+                r'Data\s*de\s*Atendimento\s*:?\s*([^\r\n]+)'
+            ]
             
-            # Busca por procedimento após "CONSULTA EM" ou "EXAME DE"
-            r'(CONSULTA\s+EM\s+[A-Z\s\-]+|EXAME\s+DE\s+[A-Z\s\-]+)'
-        ]
-        
-        for pattern in procedimento_patterns:
-            match = re.search(pattern, texto, re.IGNORECASE)
-            if match:
-                procedimento = match.group(1).strip()
-                if procedimento and len(procedimento) > 3:
-                    dados["procedimento"] = procedimento
+            for pattern in patterns:
+                match = re.search(pattern, texto, re.IGNORECASE)
+                if match:
+                    data_encontrada = match.group(1).strip()
+                    dados["data_exame"] = data_encontrada
                     break
+        
+        # Pós-processamento para garantir formato correto da data
+        if dados["data_exame"] != "NÃO ENCONTRADO":
+            # Verificar se a data está no formato DD/MM/AAAA
+            data_match = re.match(r'(\d{2}/\d{2}/\d{4})', dados["data_exame"])
+            if data_match:
+                dados["data_exame"] = data_match.group(1)
+            else:
+                # Tentar extrair qualquer data no formato DD/MM/AAAA do texto encontrado
+                data_match = re.search(r'(\d{2}/\d{2}/\d{4})', dados["data_exame"])
+                if data_match:
+                    dados["data_exame"] = data_match.group(1)
+
+        # Extrair e limpar procedimento
+        procedimento_bruto = "NÃO ENCONTRADO"
+        pattern = r'Procedimentos\s*Autorizados\s*:?[\s\S]*?([^\r\n]+?)(?:\s{2,}|\r|\n)'
+        match = re.search(pattern, texto, re.IGNORECASE)
+        if match:
+            procedimento_bruto = match.group(1).strip()
+            
+        # Limpar procedimento
+        def limpar_procedimento(texto):
+            if not texto or texto == "NÃO ENCONTRADO":
+                return texto
+                
+            # Verificar se o texto contém "CONSULTA EM" e extrair o procedimento completo
+            consulta_match = re.search(r'(CONSULTA\s+EM\s+[A-ZÀ-Úa-zà-ú\s\-]+)', texto, flags=re.IGNORECASE)
+            if consulta_match:
+                return consulta_match.group(1).strip()
+                
+            # Verificar outros tipos de procedimentos
+            outros_procedimentos = [
+                r'(TOMOGRAFIA\s+[A-ZÀ-Úa-zà-ú\s\-]+)',
+                r'(RESSONANCIA\s+[A-ZÀ-Úa-zà-ú\s\-]+)',
+                r'(EXAME\s+[A-ZÀ-Úa-zà-ú\s\-]+)'
+            ]
+            
+            for pattern in outros_procedimentos:
+                match = re.search(pattern, texto, flags=re.IGNORECASE)
+                if match:
+                    return match.group(1).strip()
+            
+            # Remover "Cod. Unificado:", "Cod. Interno:" e variações
+            texto = re.sub(r'Cod\.\s*Unificado\s*:?', '', texto, flags=re.IGNORECASE)
+            texto = re.sub(r'Cod\.\s*Interno\s*:?', '', texto, flags=re.IGNORECASE)
+            
+            # Extrair apenas palavras e hífens (sem números)
+            palavras = re.findall(r'[A-ZÀ-Úa-zà-ú\s\-]+', texto)
+            texto = ' '.join(palavras)
+            
+            # Normalizar espaços e remover espaços extras
+            texto = re.sub(r'\s+', ' ', texto).strip()
+            
+            # Se o resultado for muito curto (menos de 3 caracteres), considerar como não encontrado
+            if len(texto) < 3:
+                return "NÃO ENCONTRADO"
+                
+            return texto
+        
+        # Aplicar a função de limpeza ao procedimento bruto
+        dados["procedimento"] = limpar_procedimento(procedimento_bruto)
+        
+        # Se ainda não encontrou o procedimento, tentar padrões alternativos
+        if dados["procedimento"] == "NÃO ENCONTRADO":
+            patterns = [
+                # Busca por CONSULTA EM seguido de texto
+                r'CONSULTA\s+EM\s+([A-ZÀ-Úa-zà-ú\s\-]+)',
+                
+                # Busca por TOMOGRAFIA seguido de texto
+                r'TOMOGRAFIA\s+([A-ZÀ-Úa-zà-ú\s\-]+)',
+                
+                # Busca por EXAME seguido de texto
+                r'EXAME\s+([A-ZÀ-Úa-zà-ú\s\-]+)'
+            ]
+            
+            for pattern in patterns:
+                match = re.search(pattern, texto, re.IGNORECASE)
+                if match:
+                    # Capturar o texto completo, não apenas o grupo
+                    inicio = match.start()
+                    fim = match.end()
+                    procedimento_completo = texto[inicio:fim].strip()
+                    dados["procedimento"] = procedimento_completo
+                    break
+                    
+        return dados
+        
+    except Exception as e:
+        print(f"Erro ao extrair dados: {str(e)}")
+        # Retornar o dicionário com valores padrão em caso de erro
+        return dados
+
+def processar_pdf(pdf_path):
+    """
+    Processa um único arquivo PDF.
+    
+    Args:
+        pdf_path: Caminho para o arquivo PDF
+        
+    Returns:
+        Dicionário com os dados extraídos ou None em caso de erro
+    """
+    try:
+        nome_arquivo = os.path.basename(pdf_path)
+        
+        # Extrair texto do PDF
+        texto = extrair_texto_pdf(pdf_path)
+        
+        # Verificar se conseguiu extrair texto
+        if not texto.strip():
+            return {"erro": f"Não foi possível extrair texto do PDF {nome_arquivo}", "arquivo": nome_arquivo}
+        
+        # Extrair dados do texto
+        dados = extrair_dados(texto, nome_arquivo)
+        
+        # Adicionar o nome do arquivo aos dados
+        dados["arquivo"] = nome_arquivo
         
         return dados
         
     except Exception as e:
-        print(f"Erro ao extrair dados: {e}")
-        return dados
+        return {"erro": str(e), "arquivo": os.path.basename(pdf_path)}
 
 @app.route('/')
 def index():
+    """Rota principal que renderiza a página de upload"""
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    """
+    Rota para processar o upload de arquivos PDF
+    
+    Recebe arquivos PDF via formulário, processa-os e retorna os dados extraídos
+    """
     # Verificar se a requisição contém arquivos
     if 'files[]' not in request.files:
         return jsonify({"erro": "Nenhum arquivo enviado"}), 400
     
     files = request.files.getlist('files[]')
     
-    # Verificar se há arquivos selecionados
+    # Verificar se há arquivos
     if not files or files[0].filename == '':
         return jsonify({"erro": "Nenhum arquivo selecionado"}), 400
     
-    # Verificar se o número de arquivos não excede o limite
+    # Verificar o número de arquivos
     if len(files) > MAX_FILES:
         return jsonify({"erro": f"Número máximo de arquivos excedido. Limite: {MAX_FILES}"}), 400
     
-    # Obter o ID da planilha do Google Sheets
-    id_planilha = request.form.get('id_planilha', '')
-    if not id_planilha:
-        return jsonify({"erro": "ID da planilha do Google Sheets não fornecido"}), 400
-    
     # Processar cada arquivo
     resultados = []
-    dados_extraidos = []
+    sucessos = 0
+    falhas = 0
     
     for file in files:
-        # Verificar se o arquivo tem uma extensão permitida
+        # Verificar se é um arquivo permitido
         if not allowed_file(file.filename):
+            resultados.append({"erro": f"Tipo de arquivo não permitido: {file.filename}", "arquivo": file.filename})
+            falhas += 1
+            continue
+        
+        # Verificar o tamanho do arquivo
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        
+        if file_size > MAX_FILE_SIZE:
             resultados.append({
-                "arquivo": file.filename,
-                "erro": "Tipo de arquivo não permitido. Apenas PDFs são aceitos."
+                "erro": f"Tamanho do arquivo excede o limite de {MAX_FILE_SIZE/1024/1024:.1f}MB: {file.filename}", 
+                "arquivo": file.filename
             })
+            falhas += 1
             continue
         
         # Salvar o arquivo
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
         
-        try:
-            file.save(file_path)
-            
-            # Extrair texto do PDF
-            texto = extrair_texto_pdf(file_path)
-            
-            if not texto:
-                resultados.append({
-                    "arquivo": file.filename,
-                    "erro": "Não foi possível extrair texto do PDF."
-                })
-                continue
-            
-            # Extrair dados do texto
-            dados = extrair_dados(texto, file.filename)
-            
-            # Adicionar à lista de dados extraídos
-            dados_extraidos.append(dados)
-            
-            # Adicionar ao resultado
-            resultados.append({
-                "arquivo": file.filename,
-                "dados": dados
-            })
-            
-        except Exception as e:
-            resultados.append({
-                "arquivo": file.filename,
-                "erro": f"Erro ao processar arquivo: {str(e)}"
-            })
+        # Processar o arquivo
+        resultado = processar_pdf(file_path)
+        
+        # Verificar se houve erro no processamento
+        if "erro" in resultado:
+            falhas += 1
+        else:
+            sucessos += 1
+        
+        resultados.append(resultado)
     
-    # Adicionar dados à planilha do Google Sheets
-    if dados_extraidos:
-        try:
-            resultado_planilha = adicionar_dados_planilha(id_planilha, dados_extraidos)
-            
-            # Verificar se houve erro na adição à planilha
-            if "erro" in resultado_planilha:
-                return jsonify({
-                    "resultados": resultados,
-                    "erro_planilha": resultado_planilha["erro"]
-                }), 500
-            
-            # Adicionar resultado da planilha à resposta
-            return jsonify({
-                "resultados": resultados,
-                "resultado_planilha": resultado_planilha
-            })
-            
-        except Exception as e:
-            return jsonify({
-                "resultados": resultados,
-                "erro_planilha": f"Erro ao adicionar dados à planilha: {str(e)}"
-            }), 500
-    
-    return jsonify({"resultados": resultados})
+    # Retornar os resultados
+    return jsonify({
+        "resultados": resultados,
+        "estatisticas": {
+            "total": len(files),
+            "sucessos": sucessos,
+            "falhas": falhas
+        }
+    })
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/download/csv', methods=['POST'])
+def download_csv():
+    """
+    Rota para gerar e baixar um arquivo CSV com os dados extraídos
+    
+    Recebe os dados extraídos via JSON e retorna um arquivo CSV
+    """
+    # Obter os dados do corpo da requisição
+    dados = request.json.get('dados', [])
+    
+    if not dados:
+        return jsonify({"erro": "Nenhum dado fornecido"}), 400
+    
+    # Criar DataFrame com os dados
+    df = pd.DataFrame(dados)
+    
+    # Salvar DataFrame como CSV
+    csv_file = os.path.join(app.config['UPLOAD_FOLDER'], 'dados_extraidos.csv')
+    df.to_csv(csv_file, index=False)
+    
+    # Retornar o arquivo CSV
+    return send_from_directory(app.config['UPLOAD_FOLDER'], 'dados_extraidos.csv', as_attachment=True)
+
+@app.route('/download/excel', methods=['POST'])
+def download_excel():
+    """
+    Rota para gerar e baixar um arquivo Excel com os dados extraídos
+    
+    Recebe os dados extraídos via JSON e retorna um arquivo Excel
+    """
+    # Obter os dados do corpo da requisição
+    dados = request.json.get('dados', [])
+    
+    if not dados:
+        return jsonify({"erro": "Nenhum dado fornecido"}), 400
+    
+    # Criar DataFrame com os dados
+    df = pd.DataFrame(dados)
+    
+    # Salvar DataFrame como Excel
+    excel_file = os.path.join(app.config['UPLOAD_FOLDER'], 'dados_extraidos.xlsx')
+    df.to_excel(excel_file, index=False)
+    
+    # Retornar o arquivo Excel
+    return send_from_directory(app.config['UPLOAD_FOLDER'], 'dados_extraidos.xlsx', as_attachment=True)
+
+@app.route('/planilha', methods=['POST'])
+def adicionar_planilha():
+      # Obter os dados do corpo da requisição
+    dados = request.json.get('dados', [])
+    id_planilha = request.json.get('id_planilha', '')
+    
+    # Usar a função de integração
+    resultado = adicionar_dados_planilha(id_planilha, dados)
+    
+    # Verificar se houve erro
+    if "erro" in resultado:
+        return jsonify(resultado), 500
+    
+    return jsonify(resultado)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

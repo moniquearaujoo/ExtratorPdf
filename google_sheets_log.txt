@@ -1,0 +1,56 @@
+
+
+--- NOVA EXECUÇÃO: 2025-04-28 15:58:31 ---
+ID da planilha: 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Número de registros: 3
+Iniciando adição de 3 registros à planilha 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Configurando credenciais...
+Credenciais carregadas com sucesso
+Email da conta de serviço: servico-planilha@responsive-gist-456915-c1.iam.gserviceaccount.com
+Autorizando cliente gspread...
+Cliente gspread autorizado com sucesso
+Tentando abrir planilha com ID: 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Planilha aberta com sucesso
+Selecionando primeira aba...
+Primeira aba selecionada com sucesso
+Obtendo valores existentes...
+Obtidos 8 linhas da planilha
+Cabeçalho existente: ['DATA DA AUTORIZACAO', 'COD. SOLICITAÇÃO', 'CNS DO PACIENTE', 'UNID. SOLICITANTE', 'UNID. EXECUTANTE', 'PAES', 'CONSULTA/EXAME/ESPECIALIDADE', 'PRIORIDADE', 'STATUS', 'DATA DO EXAME/CONSULTA', 'ABSENTEÍSMO', 'DEMANDA REPRIMIDA', 'MUNICIPIO EXECUTANTE']
+Mapeamento de índices de colunas: {'codigo_solicitacao': 1, 'cns': 2, 'unidade_solicitante': 3, 'unidade_executante': 4, 'procedimento': 6, 'data_exame': 9}
+Preparando novas linhas...
+Códigos existentes na planilha: 7
+Novas linhas preparadas: 3
+Códigos duplicados: 0
+Registros inválidos: 0
+Última linha preenchida: 8
+Adicionando 3 novas linhas a partir de A9...
+Dados adicionados com sucesso à planilha
+Operação concluída com sucesso: Registros adicionados: 3
+
+
+--- NOVA EXECUÇÃO: 2025-04-28 15:59:16 ---
+ID da planilha: 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Número de registros: 4
+Iniciando adição de 4 registros à planilha 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Configurando credenciais...
+Credenciais carregadas com sucesso
+Email da conta de serviço: servico-planilha@responsive-gist-456915-c1.iam.gserviceaccount.com
+Autorizando cliente gspread...
+Cliente gspread autorizado com sucesso
+Tentando abrir planilha com ID: 1K1K22jVVdhbnQ5423VBj3mheYxmJ93lLygcmpGENmqs
+Planilha aberta com sucesso
+Selecionando primeira aba...
+Primeira aba selecionada com sucesso
+Obtendo valores existentes...
+Obtidos 11 linhas da planilha
+Cabeçalho existente: ['DATA DA AUTORIZACAO', 'COD. SOLICITAÇÃO', 'CNS DO PACIENTE', 'UNID. SOLICITANTE', 'UNID. EXECUTANTE', 'PAES', 'CONSULTA/EXAME/ESPECIALIDADE', 'PRIORIDADE', 'STATUS', 'DATA DO EXAME/CONSULTA', 'ABSENTEÍSMO', 'DEMANDA REPRIMIDA', 'MUNICIPIO EXECUTANTE']
+Mapeamento de índices de colunas: {'codigo_solicitacao': 1, 'cns': 2, 'unidade_solicitante': 3, 'unidade_executante': 4, 'procedimento': 6, 'data_exame': 9}
+Preparando novas linhas...
+Códigos existentes na planilha: 10
+Novas linhas preparadas: 1
+Códigos duplicados: 3
+Registros inválidos: 0
+Última linha preenchida: 11
+Adicionando 1 novas linhas a partir de A12...
+Dados adicionados com sucesso à planilha
+Operação concluída com sucesso: Documento 587000121, 586605885, 594139882 já se encontra na planilha. Registros adicionados: 1

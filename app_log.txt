@@ -1,0 +1,318 @@
+[2025-04-24 15:27:50] === Aplicação iniciada ===
+[2025-04-24 15:27:50] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-24 15:27:50] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-24 15:28:03] === Aplicação iniciada ===
+[2025-04-24 15:28:03] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-24 15:28:03] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-24 15:28:09] Recebendo requisição de upload...
+[2025-04-24 15:28:09] Processando 1 arquivos...
+[2025-04-24 15:28:09] Arquivo salvo: uploads\DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-24 15:28:10] Extraindo texto do PDF: uploads\DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-24 15:28:10] Texto extraído com sucesso usando método padrão: 1467 caracteres
+[2025-04-24 15:28:10] Extraindo dados do texto para arquivo: DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-24 15:28:10] Texto extraído salvo em: texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-24 15:28:10] CNS encontrado: 709009841712618
+[2025-04-24 15:28:10] Código de solicitação encontrado: 582076677
+[2025-04-24 15:28:10] unidade_executante encontrado: Cod. CNES
+[2025-04-24 15:28:10] data_exame encontrado: GERALDO CAMILO NETOTER ● 18/02/2025 ● 08:00hrs
+[2025-04-24 15:28:10] Município de residência encontrado: CEP
+[2025-04-24 15:28:10] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-24 15:28:10] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-24 15:28:10] Procedimento encontrado: CONSULTA EM CIRURGIA GERAL - BARIATRICA03010100720005005Data da Extração dos Dados
+[2025-04-24 15:28:10] Dados extraídos com sucesso: DANIELLY MABEL - SISREG III - Servidor de Producao.pdf
+[2025-04-24 15:28:10] Processamento concluído: 1 sucessos, 0 erros
+[2025-04-24 15:28:47] === Aplicação iniciada ===
+[2025-04-24 15:28:47] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-24 15:28:47] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 15:23:58] Recebendo requisição de upload...
+[2025-04-28 15:23:58] Processando 3 arquivos...
+[2025-04-28 15:23:58] Arquivo salvo: uploads\RAIMUNDO_TADEU.pdf
+[2025-04-28 15:23:58] Extraindo texto do PDF: uploads\RAIMUNDO_TADEU.pdf
+[2025-04-28 15:23:58] Texto extraído com sucesso usando método padrão: 1562 caracteres
+[2025-04-28 15:23:58] Extraindo dados do texto para arquivo: RAIMUNDO_TADEU.pdf
+[2025-04-28 15:23:58] Texto extraído salvo em: texto_extraido_RAIMUNDO_TADEU.pdf.txt
+[2025-04-28 15:23:58] CNS encontrado: 708406219422267
+[2025-04-28 15:23:58] Código de solicitação encontrado: 587000121
+[2025-04-28 15:23:58] unidade_executante encontrado: Cod. CNES
+[2025-04-28 15:23:58] data_exame encontrado: THALES FIGUEIREDO SEABRAQUI ● 06/03/2025 ● 12:00hrs
+[2025-04-28 15:23:58] Município de residência encontrado: CEP
+[2025-04-28 15:23:58] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 15:23:58] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 15:23:58] Procedimento encontrado: CONSULTA EM ORTOPEDIA - JOELHO03010100720016009Data da Extração dos Dados
+[2025-04-28 15:23:58] Dados extraídos com sucesso: RAIMUNDO TADEU.pdf
+[2025-04-28 15:23:58] Arquivo salvo: uploads\WEVERTON_.pdf
+[2025-04-28 15:23:58] Extraindo texto do PDF: uploads\WEVERTON_.pdf
+[2025-04-28 15:23:58] Texto extraído com sucesso usando método padrão: 1543 caracteres
+[2025-04-28 15:23:58] Extraindo dados do texto para arquivo: WEVERTON_.pdf
+[2025-04-28 15:23:58] Texto extraído salvo em: texto_extraido_WEVERTON_.pdf.txt
+[2025-04-28 15:23:58] CNS encontrado: 206111178560008
+[2025-04-28 15:23:58] Código de solicitação encontrado: 586605885
+[2025-04-28 15:23:58] unidade_executante encontrado: Cod. CNES
+[2025-04-28 15:23:58] data_exame encontrado: VINICIUS TIBURTINO CHAVES OLIVEIRASEX ● 14/03/2025 ● 07:00hrs
+[2025-04-28 15:23:58] Município de residência encontrado: CEP
+[2025-04-28 15:23:58] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 15:23:58] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 15:23:58] Procedimento encontrado: CONSULTA EM ORTOPEDIA - JOELHO03010100720016009Data da Extração dos Dados
+[2025-04-28 15:23:58] Dados extraídos com sucesso: WEVERTON .pdf
+[2025-04-28 15:23:58] Arquivo salvo: uploads\AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 15:23:58] Extraindo texto do PDF: uploads\AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 15:23:58] Texto extraído com sucesso usando método padrão: 1654 caracteres
+[2025-04-28 15:23:58] Extraindo dados do texto para arquivo: AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 15:23:58] Texto extraído salvo em: texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 15:23:58] CNS encontrado: 705008436371351
+[2025-04-28 15:23:58] Código de solicitação encontrado: 594139882
+[2025-04-28 15:23:58] unidade_executante encontrado: Cod. CNES
+[2025-04-28 15:23:58] data_exame encontrado: HELDER MOURA GOMESSEG ● 28/04/2025 ● 13:00hrs
+[2025-04-28 15:23:58] Município de residência encontrado: CEP
+[2025-04-28 15:23:58] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 15:23:58] Unidade executante encontrada (padrão alternativo): METROPOLITANO DOM JOSE MARIA PIRES
+[2025-04-28 15:23:58] Procedimento encontrado: CONSULTA EM CARDIOLOGIA GERAL - ADULTO03010100720003001
+[2025-04-28 15:23:58] Dados extraídos com sucesso: AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf
+[2025-04-28 15:23:58] Processamento concluído: 3 sucessos, 0 erros
+[2025-04-28 16:12:38] === Aplicação iniciada ===
+[2025-04-28 16:12:38] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:12:38] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'ia_extract_municipio.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'testar_extracao_municipio.py', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:12:50] === Aplicação iniciada ===
+[2025-04-28 16:12:50] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:12:50] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'ia_extract_municipio.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'testar_extracao_municipios.py', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:13:18] === Aplicação iniciada ===
+[2025-04-28 16:13:18] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:13:18] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'ia_extract_municipio.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'testar_extracao_municipios.py', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:13:19] === Aplicação iniciada ===
+[2025-04-28 16:13:19] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:13:19] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'ia_extract_municipio.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'testar_extracao_municipios.py', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:13:47] Recebendo requisição de upload...
+[2025-04-28 16:13:47] Processando 3 arquivos...
+[2025-04-28 16:13:47] Arquivo salvo: uploads\AGENDAMENTO_-_FRANCISCO_.pdf
+[2025-04-28 16:13:47] Extraindo texto do PDF: uploads\AGENDAMENTO_-_FRANCISCO_.pdf
+[2025-04-28 16:13:47] Texto extraído com sucesso usando método padrão: 1757 caracteres
+[2025-04-28 16:13:47] Extraindo dados do texto para arquivo: AGENDAMENTO_-_FRANCISCO_.pdf
+[2025-04-28 16:13:47] Texto extraído salvo em: texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt
+[2025-04-28 16:13:47] CNS encontrado: 704202799231883
+[2025-04-28 16:13:47] Código de solicitação encontrado: 592953787
+[2025-04-28 16:13:47] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:13:47] data_exame encontrado: CAMILLA MARIA GALDINO DE ARAUJO LUCENAQUA ● 09/04/2025 ● 09:00hrs
+[2025-04-28 16:13:47] Município de residência encontrado: CEP
+[2025-04-28 16:13:47] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:13:47] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-28 16:13:47] Procedimento encontrado: CONSULTA EM OTORRINOLARINGOLOGIA - REGULACAO03010100720710862
+[2025-04-28 16:13:47] Dados extraídos com sucesso: AGENDAMENTO - FRANCISCO .pdf
+[2025-04-28 16:13:47] Arquivo salvo: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:13:47] Extraindo texto do PDF: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:13:47] Texto extraído com sucesso usando método padrão: 1520 caracteres
+[2025-04-28 16:13:47] Extraindo dados do texto para arquivo: CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:13:47] Texto extraído salvo em: texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt
+[2025-04-28 16:13:47] CNS encontrado: 700004330172407
+[2025-04-28 16:13:47] Código de solicitação encontrado: 594591709
+[2025-04-28 16:13:47] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:13:47] data_exame encontrado: MARCOS VINICIOS AMORIM FREITASQUA ● 16/04/2025 ● 12:00hrs
+[2025-04-28 16:13:47] Município de residência encontrado: CEP
+[2025-04-28 16:13:47] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:13:47] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 16:13:47] Procedimento encontrado: CONSULTA EM ORTOPEDIA - QUADRIL03010100720016010Data da Extração dos Dados
+[2025-04-28 16:13:47] Dados extraídos com sucesso: CONSULTA CARLOS BRENO.pdf
+[2025-04-28 16:13:47] Arquivo salvo: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:13:47] Extraindo texto do PDF: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:13:47] Texto extraído com sucesso usando método padrão: 1550 caracteres
+[2025-04-28 16:13:47] Extraindo dados do texto para arquivo: CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:13:47] Texto extraído salvo em: texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt
+[2025-04-28 16:13:47] CNS encontrado: 707005836774333
+[2025-04-28 16:13:47] Código de solicitação encontrado: 573472735
+[2025-04-28 16:13:47] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:13:47] data_exame encontrado: JOSIVAL PEREIRA DE ARAUJO JUNIORSEG ● 16/12/2024 ● 14:00hrs
+[2025-04-28 16:13:47] Município de residência encontrado: CEP
+[2025-04-28 16:13:47] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:13:47] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-28 16:13:47] Procedimento encontrado: CONSULTA EM CIRURGIA DE CABECA E PESCOCO - GERAL - PPI03010100720703501Data da Extração dos Dados
+[2025-04-28 16:13:47] Dados extraídos com sucesso: CONSULTA CIR. CABEÇA E PESCOÇO - MARIA S. .pdf
+[2025-04-28 16:13:47] Processamento concluído: 3 sucessos, 0 erros
+[2025-04-28 16:26:46] === Aplicação iniciada ===
+[2025-04-28 16:26:55] Recebendo requisição de upload...
+[2025-04-28 16:26:55] Processando 4 arquivos...
+[2025-04-28 16:26:55] Arquivo salvo: uploads\Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Extraindo texto do PDF: uploads\Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído com sucesso usando método padrão: 1788 caracteres
+[2025-04-28 16:26:55] Extraindo dados do texto para arquivo: Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído salvo em: texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 16:26:55] CNS encontrado: 709200294582238
+[2025-04-28 16:26:55] Código de solicitação encontrado: 375183020
+[2025-04-28 16:26:55] unidade_solicitante encontrado: Cod. CNES
+[2025-04-28 16:26:55] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:26:55] data_exame encontrado: TIBIRICA DE MEDEIROS BARBOSAQUA ● 21/08/2024 ● 07:00hrs
+[2025-04-28 16:26:55] Procedimento encontrado: CONSULTA EM ORTOPEDIA - OMBRO03010100720110004
+[2025-04-28 16:26:55] Dados extraídos com sucesso: Maria José formiga - SISREG III - Servidor de Producao.pdf
+[2025-04-28 16:26:55] Arquivo salvo: uploads\MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Extraindo texto do PDF: uploads\MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído com sucesso usando método padrão: 1547 caracteres
+[2025-04-28 16:26:55] Extraindo dados do texto para arquivo: MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído salvo em: texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 16:26:55] CNS encontrado: 704309501841493
+[2025-04-28 16:26:55] Código de solicitação encontrado: 875086914
+[2025-04-28 16:26:55] unidade_solicitante encontrado: Cod. CNES
+[2025-04-28 16:26:55] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:26:55] data_exame encontrado: DANIEL HORTIZ DE CARVALHO NOBRE FELIPESEX ● 31/01/2025 ● 14:00hrs
+[2025-04-28 16:26:55] Procedimento encontrado: CONSULTA EM CIRURGIA GERAL - BARIATRICA03010100720005005Data da Extração dos Dados
+[2025-04-28 16:26:55] Dados extraídos com sucesso: MARYLIA - SISREG III - Servidor de Producao.pdf
+[2025-04-28 16:26:55] Arquivo salvo: uploads\ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Extraindo texto do PDF: uploads\ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído com sucesso usando método padrão: 1757 caracteres
+[2025-04-28 16:26:55] Extraindo dados do texto para arquivo: ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído salvo em: texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 16:26:55] CNS encontrado: 700003282663700
+[2025-04-28 16:26:55] Código de solicitação encontrado: 063868711
+[2025-04-28 16:26:55] unidade_solicitante encontrado: Cod. CNES
+[2025-04-28 16:26:55] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:26:55] data_exame encontrado: FRANCISCO KARTNEY SARMENTO PEDROSASEG ● 17/06/2024 ● 09:00hrs
+[2025-04-28 16:26:55] Procedimento encontrado: CONSULTA EM ORTOPEDIA - JOELHO03010100720016009
+[2025-04-28 16:26:55] Dados extraídos com sucesso: ORLANDO - SISREG III - Servidor de Producao.pdf
+[2025-04-28 16:26:55] Arquivo salvo: uploads\SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Extraindo texto do PDF: uploads\SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído com sucesso usando método padrão: 1779 caracteres
+[2025-04-28 16:26:55] Extraindo dados do texto para arquivo: SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf
+[2025-04-28 16:26:55] Texto extraído salvo em: texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 16:26:55] CNS encontrado: 702501396891133
+[2025-04-28 16:26:55] Código de solicitação encontrado: 633159011
+[2025-04-28 16:26:55] unidade_solicitante encontrado: Cod. CNES
+[2025-04-28 16:26:55] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:26:55] data_exame encontrado: GEORGE KENNEDY DANTAS ROCHASEG ● 15/07/2024 ● 12:00hrs
+[2025-04-28 16:26:55] Procedimento encontrado: CONSULTA EM ORTOPEDIA - JOELHO03010100720016009
+[2025-04-28 16:26:55] Dados extraídos com sucesso: SISREG III - GIZEUDA - Servidor de Producao.pdf
+[2025-04-28 16:26:55] Processamento concluído: 4 sucessos, 0 erros
+[2025-04-28 16:28:05] === Aplicação iniciada ===
+[2025-04-28 16:28:05] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:28:05] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'ia_extract_municipio.py', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'testar_extracao_municipios.py', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:28:23] === Aplicação iniciada ===
+[2025-04-28 16:28:23] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:28:23] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:28:33] Recebendo requisição de upload...
+[2025-04-28 16:28:33] Processando 2 arquivos...
+[2025-04-28 16:28:33] Arquivo salvo: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:28:33] Extraindo texto do PDF: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:28:33] Texto extraído com sucesso usando método padrão: 1520 caracteres
+[2025-04-28 16:28:33] Extraindo dados do texto para arquivo: CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:28:33] Texto extraído salvo em: texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt
+[2025-04-28 16:28:33] CNS encontrado: 700004330172407
+[2025-04-28 16:28:33] Código de solicitação encontrado: 594591709
+[2025-04-28 16:28:33] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:28:33] data_exame encontrado: MARCOS VINICIOS AMORIM FREITASQUA ● 16/04/2025 ● 12:00hrs
+[2025-04-28 16:28:33] Município de residência encontrado: CEP
+[2025-04-28 16:28:33] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:28:33] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 16:28:33] Procedimento encontrado: CONSULTA EM ORTOPEDIA - QUADRIL03010100720016010Data da Extração dos Dados
+[2025-04-28 16:28:33] Dados extraídos com sucesso: CONSULTA CARLOS BRENO.pdf
+[2025-04-28 16:28:33] Arquivo salvo: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:28:33] Extraindo texto do PDF: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:28:33] Texto extraído com sucesso usando método padrão: 1550 caracteres
+[2025-04-28 16:28:33] Extraindo dados do texto para arquivo: CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:28:33] Texto extraído salvo em: texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt
+[2025-04-28 16:28:33] CNS encontrado: 707005836774333
+[2025-04-28 16:28:33] Código de solicitação encontrado: 573472735
+[2025-04-28 16:28:33] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:28:33] data_exame encontrado: JOSIVAL PEREIRA DE ARAUJO JUNIORSEG ● 16/12/2024 ● 14:00hrs
+[2025-04-28 16:28:33] Município de residência encontrado: CEP
+[2025-04-28 16:28:33] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:28:33] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-28 16:28:33] Procedimento encontrado: CONSULTA EM CIRURGIA DE CABECA E PESCOCO - GERAL - PPI03010100720703501Data da Extração dos Dados
+[2025-04-28 16:28:33] Dados extraídos com sucesso: CONSULTA CIR. CABEÇA E PESCOÇO - MARIA S. .pdf
+[2025-04-28 16:28:33] Processamento concluído: 2 sucessos, 0 erros
+[2025-04-28 16:28:44] === Aplicação iniciada ===
+[2025-04-28 16:28:44] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:28:44] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:28:52] Recebendo requisição de upload...
+[2025-04-28 16:28:52] Processando 3 arquivos...
+[2025-04-28 16:28:52] Arquivo salvo: uploads\AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf
+[2025-04-28 16:28:52] Extraindo texto do PDF: uploads\AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf
+[2025-04-28 16:28:52] Texto extraído com sucesso usando método padrão: 1502 caracteres
+[2025-04-28 16:28:52] Extraindo dados do texto para arquivo: AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf
+[2025-04-28 16:28:52] Texto extraído salvo em: texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt
+[2025-04-28 16:28:52] CNS encontrado: 700006011493208
+[2025-04-28 16:28:52] Código de solicitação encontrado: 580442897
+[2025-04-28 16:28:52] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:28:52] data_exame encontrado: LUCIANO LEITE DA CUNHA JUNIORQUI ● 06/02/2025 ● 12:00hrs
+[2025-04-28 16:28:52] Município de residência encontrado: CEP
+[2025-04-28 16:28:52] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:28:52] Unidade executante encontrada (padrão alternativo): GERAL DE MAMANGUAPE
+[2025-04-28 16:28:52] Procedimento encontrado: CONSULTA EM ORTOPEDIA - JOELHO03010100720016009Data da Extração dos Dados
+[2025-04-28 16:28:52] Dados extraídos com sucesso: AGENDAMENTO - SISREG III - EDCARLOS .pdf
+[2025-04-28 16:28:52] Arquivo salvo: uploads\MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf
+[2025-04-28 16:28:52] Extraindo texto do PDF: uploads\MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf
+[2025-04-28 16:28:52] Texto extraído com sucesso usando método padrão: 1937 caracteres
+[2025-04-28 16:28:52] Extraindo dados do texto para arquivo: MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf
+[2025-04-28 16:28:52] Texto extraído salvo em: texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt
+[2025-04-28 16:28:52] CNS encontrado: 705807410157435
+[2025-04-28 16:28:52] data_exame encontrado: IVANCLECIO DE SOUZA RODRIGUESSAB ● 24/08/2024 ● 16h00min
+[2025-04-28 16:28:52] Município de residência encontrado: BRASILBELEM - PBTelefone(s)
+[2025-04-28 16:28:52] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:28:52] Unidade executante encontrada (padrão alternativo): DISTRITAL DE BELEMREGULADORNSFª Vez
+[2025-04-28 16:28:52] Procedimento encontrado: CONSULTA EM CIRURGIA GERAL - REGULACAO03010100720710842
+[2025-04-28 16:28:52] AVISO: Campo codigo_solicitacao não encontrado no texto
+[2025-04-28 16:28:52] Dados extraídos com sucesso: MARIA FLUVIA - SISREG III - Servidor de Producao_INVALIDO.pdf
+[2025-04-28 16:28:52] Arquivo salvo: uploads\Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:28:52] Extraindo texto do PDF: uploads\Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:28:52] Texto extraído com sucesso usando método padrão: 1788 caracteres
+[2025-04-28 16:28:52] Extraindo dados do texto para arquivo: Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf
+[2025-04-28 16:28:52] Texto extraído salvo em: texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt
+[2025-04-28 16:28:52] CNS encontrado: 709200294582238
+[2025-04-28 16:28:52] Código de solicitação encontrado: 553751830
+[2025-04-28 16:28:52] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:28:52] data_exame encontrado: TIBIRICA DE MEDEIROS BARBOSAQUA ● 21/08/2024 ● 07:00hrs
+[2025-04-28 16:28:52] Município de residência encontrado: CEP
+[2025-04-28 16:28:52] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:28:52] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 16:28:52] Procedimento encontrado: CONSULTA EM ORTOPEDIA - OMBRO03010100720110004
+[2025-04-28 16:28:52] Dados extraídos com sucesso: Maria José formiga - SISREG III - Servidor de Producao.pdf
+[2025-04-28 16:28:52] Processamento concluído: 3 sucessos, 0 erros
+[2025-04-28 16:30:02] === Aplicação iniciada ===
+[2025-04-28 16:30:02] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:30:02] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:30:12] === Aplicação iniciada ===
+[2025-04-28 16:30:12] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:30:12] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:30:19] === Aplicação iniciada ===
+[2025-04-28 16:30:19] Diretório atual: C:\Users\Monique Araújo\sisreg_extractor_optimized
+[2025-04-28 16:30:19] Arquivos no diretório: ['.git', '.gitignore', 'app_log.txt', 'config.json', 'credentials.json', 'dados_extraidos.csv', 'debug_resultados.json', 'google_sheets_integration_fix.py', 'google_sheets_log.txt', 'main.py', 'pdfs', 'render.yaml', 'requirements.txt', 'templates', 'texto_extraido_AGENDAMENTO - FRANCISCO .pdf.txt', 'texto_extraido_AGENDAMENTO FRANCISCO - SISREG III - Servidor de Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO MARIA HELENA - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_AGENDAMENTO_-_FRANCISCO_.pdf.txt', 'texto_extraido_AGENDAMENTO_-_SISREG_III_-_EDCARLOS_.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_IRACI_BENTO.pdf.txt', 'texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt', 'texto_extraido_AGENDAMENTO_FRANCISCO_-_SISREG_III_-_Servidor_de_Producao_valido.pdf.txt', 'texto_extraido_AGENDAMENTO_MARIA_HELENA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_CONSULTA MARIA HONÓRIO_valido.pdf.txt', 'texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt', 'texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt', 'texto_extraido_CONSULTA_CIR._GERAL_-_EMANUEL_SANTOS.pdf.txt', 'texto_extraido_CONSULTA_CIRURGIA_GERAL_-_ANDERSON_C..pdf.txt', 'texto_extraido_CONSULTA_MARIA_HONORIO_valido.pdf.txt', 'texto_extraido_DANIELLY MABEL - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_DANIELLY_MABEL_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_GENIVAL-UROLOGIA 1.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARIA_FLUVIA_-_SISREG_III_-_Servidor_de_Producao_INVALIDO.pdf.txt', 'texto_extraido_Maria_Jose_formiga_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_MARYLIA_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_ORLANDO - SISREG III - Servidor de Producao.pdf.txt', 'texto_extraido_ORLANDO_-_SISREG_III_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_PACIENTE_TEREZINHA_ROBERTO_CAVALCANTE.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU.pdf.txt', 'texto_extraido_RAIMUNDO_TADEU_1.pdf.txt', 'texto_extraido_SISREG III - GIZEUDA - Servidor de Producao.pdf.txt', 'texto_extraido_SISREG III - LORENA LOPES (1).pdf.txt', 'texto_extraido_SISREG III - Servidor de Producao (4).pdf.txt', 'texto_extraido_SISREG_III_-_GIZEUDA_-_Servidor_de_Producao.pdf.txt', 'texto_extraido_SISREG_III_-_LORENA_LOPES_.pdf.txt', 'texto_extraido_SISREG_III_-_Servidor_de_Producao_4.pdf.txt', 'texto_extraido_WEVERTON .pdf.txt', 'texto_extraido_WEVERTON_.pdf.txt', 'uploads', 'verificar_credenciais.py', '__pycache__']
+[2025-04-28 16:30:23] Recebendo requisição de upload...
+[2025-04-28 16:30:23] Processando 3 arquivos...
+[2025-04-28 16:30:23] Arquivo salvo: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:30:23] Extraindo texto do PDF: uploads\CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:30:23] Texto extraído com sucesso usando método padrão: 1520 caracteres
+[2025-04-28 16:30:23] Extraindo dados do texto para arquivo: CONSULTA_CARLOS_BRENO.pdf
+[2025-04-28 16:30:23] Texto extraído salvo em: texto_extraido_CONSULTA_CARLOS_BRENO.pdf.txt
+[2025-04-28 16:30:23] CNS encontrado: 700004330172407
+[2025-04-28 16:30:23] Código de solicitação encontrado: 594591709
+[2025-04-28 16:30:23] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:30:23] data_exame encontrado: MARCOS VINICIOS AMORIM FREITASQUA ● 16/04/2025 ● 12:00hrs
+[2025-04-28 16:30:23] Município de residência encontrado: CEP
+[2025-04-28 16:30:23] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:30:23] Unidade executante encontrada (padrão alternativo): DE EMERGENCIA E TRAUMA SENADOR HUMBERTO LUCENA
+[2025-04-28 16:30:23] Procedimento encontrado: CONSULTA EM ORTOPEDIA - QUADRIL03010100720016010Data da Extração dos Dados
+[2025-04-28 16:30:23] Dados extraídos com sucesso: CONSULTA CARLOS BRENO.pdf
+[2025-04-28 16:30:23] Arquivo salvo: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:30:23] Extraindo texto do PDF: uploads\CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:30:23] Texto extraído com sucesso usando método padrão: 1550 caracteres
+[2025-04-28 16:30:23] Extraindo dados do texto para arquivo: CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf
+[2025-04-28 16:30:23] Texto extraído salvo em: texto_extraido_CONSULTA_CIR._CABECA_E_PESCOCO_-_MARIA_S._.pdf.txt
+[2025-04-28 16:30:23] CNS encontrado: 707005836774333
+[2025-04-28 16:30:23] Código de solicitação encontrado: 573472735
+[2025-04-28 16:30:23] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:30:23] data_exame encontrado: JOSIVAL PEREIRA DE ARAUJO JUNIORSEG ● 16/12/2024 ● 14:00hrs
+[2025-04-28 16:30:23] Município de residência encontrado: CEP
+[2025-04-28 16:30:23] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:30:23] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-28 16:30:23] Procedimento encontrado: CONSULTA EM CIRURGIA DE CABECA E PESCOCO - GERAL - PPI03010100720703501Data da Extração dos Dados
+[2025-04-28 16:30:23] Dados extraídos com sucesso: CONSULTA CIR. CABEÇA E PESCOÇO - MARIA S. .pdf
+[2025-04-28 16:30:23] Arquivo salvo: uploads\AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf
+[2025-04-28 16:30:23] Extraindo texto do PDF: uploads\AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf
+[2025-04-28 16:30:23] Texto extraído com sucesso usando método padrão: 1479 caracteres
+[2025-04-28 16:30:23] Extraindo dados do texto para arquivo: AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf
+[2025-04-28 16:30:23] Texto extraído salvo em: texto_extraido_AGENDAMENTO_CONSULTA_-_VITORIA_S._CORDEIRO.pdf.txt
+[2025-04-28 16:30:23] CNS encontrado: 702506349295133
+[2025-04-28 16:30:23] Código de solicitação encontrado: 578150062
+[2025-04-28 16:30:23] unidade_executante encontrado: Cod. CNES
+[2025-04-28 16:30:23] data_exame encontrado: GERALDO CAMILO NETOTER ● 28/01/2025 ● 08:00hrs
+[2025-04-28 16:30:23] Município de residência encontrado: CEP
+[2025-04-28 16:30:23] Unidade executante após limpeza: NÃO ENCONTRADO
+[2025-04-28 16:30:23] Unidade executante encontrada (padrão alternativo): EDSON RAMALHO
+[2025-04-28 16:30:23] Procedimento encontrado: CONSULTA EM CIRURGIA GERAL - BARIATRICA03010100720005005Data da Extração dos Dados
+[2025-04-28 16:30:23] Dados extraídos com sucesso: AGENDAMENTO CONSULTA - VITORIA S. CORDEIRO.pdf
+[2025-04-28 16:30:23] Processamento concluído: 3 sucessos, 0 erros

@@ -101,24 +101,31 @@ def extrair_dados(texto, nome_arquivo=""):
     """
     import re
     import os
-    
+    from cidades_paraiba import CidadesParaiba
+
     # Inicializar o dicionário de dados com valores padrão
     dados = {
         "codigo_solicitacao": "NÃO ENCONTRADO",
         "cns": "NÃO ENCONTRADO",
-        "unidade_solicitante": "NÃO ENCONTRADO",  # Manteremos o nome do campo para compatibilidade
+        "unidade_solicitante": "NÃO ENCONTRADO", 
         "unidade_executante": "NÃO ENCONTRADO",
         "data_exame": "NÃO ENCONTRADO",
         "procedimento": "NÃO ENCONTRADO"
     }
-    
+
+    print("\n" + "="*50)
+    print(f"CONTEÚDO COMPLETO DO PDF: {nome_arquivo}")
+    print("="*50)
+    print(texto)
+    print("="*50 + "\n")
+
     try:
         # Salvar o texto para debug
         if nome_arquivo:
             debug_file = f"texto_extraido_{os.path.basename(nome_arquivo)}.txt"
             with open(debug_file, "w", encoding="utf-8") as f:
                 f.write(texto)
-        
+
         # Extrair CNS - procurar especificamente por padrões de CNS
         cns_patterns = [
             r'CNS\s*:?\s*(\d{15})',  # CNS com 15 dígitos após "CNS:"
@@ -145,7 +152,7 @@ def extrair_dados(texto, nome_arquivo=""):
         codigo_patterns = [
             # NOVOS PADRÕES: Código seguido imediatamente por data
             # Busca por "Vaga Solicitada:Vaga Consumida:" seguido por código de 9 dígitos começando com 5 e data
-            r'Vaga\s*Solicitada\s*:\s*Vaga\s*Consumida\s*:\s*(5\d{8})(\d{2}/\d{2}/\d{4})',
+            r'Código da Solicitação:\s*Situação Atual:\s*(5\d{8})',
             
             # Busca por "Consumida:" seguido por código de 9 dígitos começando com 5 e data
             r'Consumida\s*:\s*(5\d{8})(\d{2}/\d{2}/\d{4})',
@@ -174,6 +181,9 @@ def extrair_dados(texto, nome_arquivo=""):
             
             # Busca por número de 9 dígitos que começa com 5 em qualquer lugar
             r'\b(5\d{8})\b',
+
+            # Busca por número de 9 dígitos que começa com 5 após "Situação Atual"
+            r'Situação+Atual*:?[\s\S]{0,100}?(5\d{8})\b',
             
             # PADRÕES DE FALLBACK: Menos específicos
             r'C[óo]digo\s*d[ae]\s*Solicita[çc][ãa]o\s*:?[\s\S]{0,100}?(\d{9})\b',
@@ -211,7 +221,8 @@ def extrair_dados(texto, nome_arquivo=""):
         
         # Extrair unidade executante e data do exame
         outros_padroes = {
-            "unidade_executante": r'UNIDADE\s*EXECUTANTE[\s\S]*?Nome\s*:\s*([^\r\n:]+)',
+            # Novo padrão para unidade_executante
+            "unidade_executante": r'UNIDADE\s*EXECUTANTE[\s\S]*?Nome\s*:\s*([A-Z\sÀ-ÖØ-öø-ÿ]+?)(?:\s*Endereço|\s*C[óo]d\.\s*CNES|\s*Número|\s*Telefone|\s*Op\.\s*Autorizador|\s*Vaga\s*Consumida|$)',
             "data_exame": r'Data\s*e\s*Hor[áa]rio\s*de\s*Atendimento\s*:?\s*([^\r\n]+)',
         }
         
@@ -221,103 +232,32 @@ def extrair_dados(texto, nome_arquivo=""):
             if match:
                 dados[campo] = match.group(1).strip()
         
-        # MODIFICADO: Extrair município de residência (substituindo unidade_solicitante)
-        # Primeiro, tentar encontrar o padrão específico para município de residência
-        municipio_patterns = [
-            # Busca por padrão específico baseado na imagem do PDF
-            r'Bairro\s*:\s*([A-ZÀ-Ú\s]+)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([A-ZÀ-Ú\s]+[-–]\s*[A-Z]{2})',
-            
-            # Busca por padrão específico baseado na imagem do PDF - versão alternativa
-            r'Bairro\s*:([^:]+?)Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
-            
-            # Busca por "Município de Residência:" seguido de texto até "CEP:"
-            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^C]+)CEP',
-            
-            # Busca por "Município de Residência:" seguido de texto até o próximo campo ou quebra de linha
-            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
-            
-            # Busca por "Município de Residência:" na seção de dados do paciente
-            r'DADOS\s+DO\s+PACIENTE[\s\S]*?Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^\r\n:]+)',
-            
-            # Busca por texto entre "Município de Residência:" e o próximo campo
-            r'Munic[íi]pio\s+de\s+Resid[êe]ncia\s*:\s*([^:]+?)(?:\s*\w+\s*:|$)',
-            
-            # Busca por texto após "Município:" que geralmente aparece próximo a CEP
-            r'Munic[íi]pio\s*:\s*([^\r\n:]+?)(?:\s*CEP\s*:|$)'
-        ]
-        
-        municipio_encontrado = False
-        for pattern in municipio_patterns:
-            match = re.search(pattern, texto, re.IGNORECASE)
-            if match:
-                # Verificar se o padrão tem dois grupos (caso do padrão com Bairro)
-                if len(match.groups()) > 1 and 'Bairro' in pattern:
-                    municipio = match.group(2).strip()
-                else:
-                    municipio = match.group(1).strip()
-                
-                if municipio:
-                    # Limpar o resultado para remover espaços extras e caracteres indesejados
-                    municipio = re.sub(r'\s+', ' ', municipio).strip()
-                    dados["unidade_solicitante"] = municipio
-                    municipio_encontrado = True
-                    break
-        
-        # Se não encontrou o município de residência, tentar padrões específicos da imagem do PDF
-        if not municipio_encontrado:
-            # Busca direta por "JOAO PESSOA - PB" ou variações
-            cidade_estado_patterns = [
-                r'(JOAO\s+PESSOA\s*[-–]\s*PB)',
-                r'(JOÃO\s+PESSOA\s*[-–]\s*PB)',
-                r'(MANGABEIRA\s+JOAO\s+PESSOA\s*[-–]\s*PB)',
-                r'(MANGABEIRA\s+JOÃO\s+PESSOA\s*[-–]\s*PB)'
-            ]
-            
-            for pattern in cidade_estado_patterns:
-                match = re.search(pattern, texto, re.IGNORECASE)
-                if match:
-                    dados["unidade_solicitante"] = match.group(1).strip()
-                    municipio_encontrado = True
-                    break
-            
-            # Se ainda não encontrou, buscar por padrões genéricos de cidade-estado
-            if not municipio_encontrado:
-                # Busca por padrões de cidade seguida de estado (ex: JOÃO PESSOA - PB)
-                cidade_estado_pattern = r'([A-ZÀ-Ú\s]+)\s*[-–]\s*([A-Z]{2})'
-                match = re.search(cidade_estado_pattern, texto, re.IGNORECASE)
-                if match:
-                    cidade_estado = match.group(0).strip()  # Captura "JOÃO PESSOA - PB" completo
-                    dados["unidade_solicitante"] = cidade_estado
-                    
-        # Verificação final: se ainda não encontrou, tentar extrair do texto completo
-        if dados["unidade_solicitante"] == "NÃO ENCONTRADO" or not dados["unidade_solicitante"]:
-            # Busca por "COMPLEXO REGULADOR" que pode ser a unidade solicitante
-            match_complexo = re.search(r'(COMPLEXO\s+REGULADOR[A-ZÀ-Ú\s]+)', texto, re.IGNORECASE)
-            if match_complexo:
-                dados["unidade_solicitante"] = match_complexo.group(1).strip()
         
         # FUNÇÃO CORRIGIDA: Limpar unidade executante preservando o nome "HOSPITAL"
         def limpar_unidade_executante(texto):
             if not texto or texto == "NÃO ENCONTRADO":
                 return texto
-                
-            # Remover a palavra "CNES" e variações, incluindo "Cod." e "Cod"
-            texto = re.sub(r'CNES\s*:?', '', texto, flags=re.IGNORECASE)
-            texto = re.sub(r'Cod\.?\s*CNES\s*:?', '', texto, flags=re.IGNORECASE)
-            texto = re.sub(r'^Cod\.?\s+', '', texto, flags=re.IGNORECASE)
             
-            # Remover "Endereço" do final do texto
-            texto = re.sub(r'\s*Endereço$', '', texto, flags=re.IGNORECASE)
+            # 1. Encontrar o primeiro dígito no texto
+            # Se um dígito for encontrado, desconsiderar tudo a partir dele.
+            # Isso é baseado na premissa de que nomes de unidades executantes não contêm números.
+            match_digito = re.search(r'\d', texto)
+            if match_digito:
+                texto = texto[:match_digito.start()]
             
-            # Remover apenas números e caracteres especiais específicos
-            texto = re.sub(r'[0-9]', '', texto)  # Remover números
-            texto = re.sub(r'[^\w\sÀ-ÖØ-öø-ÿ]', '', texto)  # Manter letras, espaços e acentos
+            # 2. Remover qualquer caractere que não seja letra, espaço ou hífen.
+            # Isso limpa pontuações, símbolos e outros caracteres especiais que possam ter sobrado.
+            # Mantemos o hífen pois pode aparecer em nomes (ex: "Hospital São José-Maria").
+            # O flag re.UNICODE é importante para lidar corretamente com caracteres acentuados.
+            texto = re.sub(r'[^\w\sÀ-ÖØ-öø-ÿ-]', '', texto, flags=re.UNICODE)
             
-            # Normalizar espaços e remover espaços extras
+            # 3. Normalizar espaços: substituir múltiplos espaços por um único e remover espaços nas extremidades.
             texto = re.sub(r'\s+', ' ', texto).strip()
             
-            # Se o resultado for muito curto (menos de 3 caracteres), considerar como não encontrado
-            if len(texto) < 3:
+            # 4. Validação final: garantir que o resultado seja um nome válido.
+            # Se o texto resultante for muito curto ou não contiver nenhuma letra,
+            # consideramos que a extração falhou e retornamos "NÃO ENCONTRADO".
+            if len(texto) < 3 or not re.search(r'[A-ZÀ-ÖØ-öø-ÿ]', texto, flags=re.IGNORECASE):
                 return "NÃO ENCONTRADO"
                 
             return texto
@@ -411,6 +351,7 @@ def extrair_dados(texto, nome_arquivo=""):
                 if data_match:
                     dados["data_exame"] = data_match.group(1)
 
+
         # Extrair e limpar procedimento
         procedimento_bruto = "NÃO ENCONTRADO"
         pattern = r'Procedimentos\s*Autorizados\s*:?[\s\S]*?([^\r\n]+?)(?:\s{2,}|\r|\n)'
@@ -456,6 +397,7 @@ def extrair_dados(texto, nome_arquivo=""):
                 return "NÃO ENCONTRADO"
                 
             return texto
+
         
         # Aplicar a função de limpeza ao procedimento bruto
         dados["procedimento"] = limpar_procedimento(procedimento_bruto)
@@ -482,7 +424,68 @@ def extrair_dados(texto, nome_arquivo=""):
                     procedimento_completo = texto[inicio:fim].strip()
                     dados["procedimento"] = procedimento_completo
                     break
-                    
+                
+                 # NOVO TRECHO: Pegar Município de Residência e colocar como Unidade Solicitante
+                 # NOVO TRECHO: Pegar Município de Residência e colocar como Unidade Solicitante
+        try:
+            municipio_residencia = "" 
+            
+            # Padrão principal: Captura o texto após "Município de Residência:"
+            # (mantido o padrão que funcionou para o caso anterior)
+            padrao_municipio = r'Município\s*(?:de)?\s*Resid[êe]ncia\s*:\s*([^\r\n]+?)(?:\s*\d{5}-\d{3}|\s*Telefone\(s\):|\s*Laudo\s*/\s*Justificativa:|\s*DADOS\s*DA\s*SOLICITA[ÇC][ÃA]O|$)'
+            
+            match = re.search(padrao_municipio, texto, re.IGNORECASE)
+            if match:
+                municipio_residencia = match.group(1).strip()
+                
+                # REMOÇÃO DE "BRASILEIRA": Adicione esta linha
+                municipio_residencia = re.sub(r'BRASILEIRA\s*', '', municipio_residencia, flags=re.IGNORECASE).strip()
+                
+                # Remover a palavra "BRASIL" (se ainda estiver presente por algum motivo)
+                municipio_residencia = re.sub(r'BRASIL\s*', '', municipio_residencia, flags=re.IGNORECASE).strip()
+                
+                # Remover "PB" se estiver grudado no final (ex: "JOAO PESSOA - PB")
+                municipio_residencia = re.sub(r'\s*-\s*PB\s*$', '', municipio_residencia, flags=re.IGNORECASE).strip()
+                
+                # Normalizar espaços após as remoções
+                municipio_residencia = re.sub(r'\s+', ' ', municipio_residencia).strip()
+
+            # Se o primeiro padrão não encontrar, tentar o padrão de fallback
+            if not municipio_residencia: 
+                trecho_pos_municipio = re.search(r'Município\s*de\s*Residência\s*:?(.*?)(?:\d{5}-\d{3}|Telefone\(s\):)', texto, re.IGNORECASE)
+                if trecho_pos_municipio:
+                    trecho = trecho_pos_municipio.group(1)
+                    municipio = re.search(r'([A-ZÀ-Úa-zà-ú\s]+(?:\s*-\s*[A-Z]{2})?)', trecho)
+                    if municipio:
+                        municipio_residencia = municipio.group(1).strip()
+                        # Aplicar as mesmas limpezas ao resultado do fallback
+                        municipio_residencia = re.sub(r'BRASILEIRA\s*', '', municipio_residencia, flags=re.IGNORECASE).strip() # Adicionar aqui também
+                        municipio_residencia = re.sub(r'BRASIL\s*', '', municipio_residencia, flags=re.IGNORECASE).strip()
+                        municipio_residencia = re.sub(r'\s*-\s*PB\s*$', '', municipio_residencia, flags=re.IGNORECASE).strip()
+                        municipio_residencia = re.sub(r'\s+', ' ', municipio_residencia).strip()
+            
+            # Depois de encontrar e limpar o municipio_residencia no texto:
+            # Validar o município usando CidadesParaiba.validar_municipio
+            municipio_validado = CidadesParaiba.validar_municipio(municipio_residencia)
+            
+            # Atribui o valor validado ou "NÃO ENCONTRADO" se a validação falhar
+            dados["unidade_solicitante"] = municipio_validado if municipio_validado else "NÃO ENCONTRADO"
+
+        except Exception as e:
+            print(f"Erro ao extrair município para unidade solicitante: {str(e)}")
+            dados["unidade_solicitante"] = "NÃO ENCONTRADO"
+
+
+        # Mostrar os campos extraídos no console
+        print("\nCAMPOS EXTRAÍDOS PARA PLANILHA:")
+        print(f"Código de Solicitação: {dados['codigo_solicitacao']}")
+        print(f"CNS do Paciente: {dados['cns']}")
+        print(f"Unidade Executante: {dados['unidade_executante']}")
+        print(f"Unidade Solicitante: {dados['unidade_solicitante']}")
+        print(f"Data do Exame: {dados['data_exame']}")
+        print(f"Procedimento: {dados['procedimento']}")
+        print("\n")
+    
         return dados
         
     except Exception as e:

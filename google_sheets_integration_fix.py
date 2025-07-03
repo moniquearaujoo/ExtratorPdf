@@ -143,7 +143,7 @@ def adicionar_dados_planilha(id_planilha, dados, arquivo_credenciais='credential
                 "DATA DO EXAME/CONSULTA": "data_exame",
                 "COD. SOLICITAÇÃO": "codigo_solicitacao",
                 "CNS DO PACIENTE": "cns",
-                "UNID. SOLICITANTE": "unidade_solicitante",
+                "UNID. SOLICITANTE": "municipio_residencia",
                 "UNID. EXECUTANTE": "unidade_executante",
                 "CONSULTA/EXAME/ESPECIALIDADE": "procedimento",
                 # Mapeamentos alternativos para maior compatibilidade
@@ -151,7 +151,7 @@ def adicionar_dados_planilha(id_planilha, dados, arquivo_credenciais='credential
                 "CÓDIGO DE SOLICITAÇÃO": "codigo_solicitacao",
                 "CÓDIGO SOLICITAÇÃO": "codigo_solicitacao",
                 "CNS": "cns",
-                "UNIDADE SOLICITANTE": "unidade_solicitante",
+                "UNIDADE SOLICITANTE": "municipio_residencia",
                 "UNIDADE EXECUTANTE": "unidade_executante",
                 "PROCEDIMENTO": "procedimento",
                 "ESPECIALIDADE": "procedimento",
